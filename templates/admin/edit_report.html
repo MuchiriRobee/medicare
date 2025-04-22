@@ -1,0 +1,28 @@
+{% extends 'admin/admin_base.html' %}
+
+{% block content %}
+<div class="edit-report-container">
+    <h1>Edit Report</h1>
+    <form method="POST">
+        <label for="patient_name">Patient Name:</label>
+        <input type="text" id="patient_name" name="patient_name" value="{{ report.patient_name }}" required>
+
+        <label for="appointment_date">Appointment Date:</label>
+        <input type="date" id="appointment_date" name="appointment_date" value="{{ report.appointment_date }}" required>
+
+        <label for="service_type">Service Type:</label>
+        <input type="text" id="service_type" name="service_type" value="{{ report.service_type }}" required>
+
+        <label for="diagnosis">Diagnosis:</label>
+        <textarea id="diagnosis" name="diagnosis" rows="4" required>{{ report.diagnosis }}</textarea>
+
+        <label for="prescription">Prescription:</label>
+        <textarea id="prescription" name="prescription" rows="4" required>{{ report.prescription }}</textarea>
+
+        <label for="follow_up">Follow Up:</label>
+        <textarea id="follow_up" name="follow_up" rows="4" required>{{ report.follow_up }}</textarea>
+
+        <button type="submit">Update Report</button>
+    </form>
+</div>
+{% endblock %}

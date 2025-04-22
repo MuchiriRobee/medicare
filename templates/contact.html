@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - HealthPoint Medical Clinic</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Reuse the same styles from the About Us page */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #4285f4;
+            --secondary: #34a853;
+            --accent: #ea4335;
+            --light: #f8f9fa;
+            --dark: #202124;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 70px;
+        }
+
+        body {
+            overflow-x: hidden;
+            background-color: var(--light);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        .dropdown {
+    position: relative;
+}
+
+.dropdown-toggle {
+    display: block;
+    color: var(--dark);
+    font-weight: 500;
+    font-size: 16px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.dropdown-toggle:hover {
+    background-color:  rgba(255, 255, 255, 0.1);
+}
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color:  rgba(255, 255, 255, 0.1);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 200px;
+    z-index: 1000;
+}
+
+.dropdown-menu li {
+    padding: 10px;
+}
+
+.dropdown-menu li a {
+    color: rgb(8, 8, 8);
+    text-decoration: none;
+    font-size: 1rem;
+    display: block;
+}
+
+.dropdown-menu li a:hover {
+    background-color:  rgba(255, 255, 255, 0.1);
+}
+
+.dropdown:hover .dropdown-menu {
+    display: block;
+}
+        /* Header Styles */
+        header {
+            background-color: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            width: 100%;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        header.scrolled {
+            background-color: white;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 24px;
+            text-decoration: none;
+        }
+
+        .logo i {
+            color: var(--secondary);
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            transition: color 0.3s ease;
+            font-size: 16px;
+        }
+
+        nav a:hover {
+            color: var(--primary);
+        }
+
+        .book-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .book-btn:hover {
+            background-color: #3b78e7;
+            transform: translateY(-2px);
+        }
+        .login-btn{
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .login-btn:hover{
+            background-color: #3b78e7;
+            transform: translateY(-2px);
+        } 
+        /* Page Banner */
+        .page-banner {
+            height: 100vh;
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('static/images/reception.jpg') center/cover no-repeat;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+        }
+
+        .breadcrumb {
+            margin-top: 15px;
+            font-size: 16px;
+        }
+
+        .breadcrumb a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .breadcrumb a:hover {
+            color: white;
+        }
+
+        .breadcrumb .separator {
+            margin: 0 10px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .page-title {
+            font-size: 48px;
+            margin-bottom: 10px;
+            animation: fadeInUp 1s ease;
+        }
+
+        /* Contact Section */
+        .contact {
+            padding: 100px 0;
+            background-color: white;
+        }
+
+        .contact-container {
+            display: flex;
+            gap: 50px;
+            align-items: flex-start;
+        }
+
+        .contact-info {
+            flex: 1;
+        }
+
+        .contact-info h2 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            color: var(--dark);
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        .contact-info h2::after {
+            content: '';
+            position: absolute;
+            width: 60px;
+            height: 4px;
+            background-color: var(--primary);
+            bottom: 0;
+            left: 0;
+            border-radius: 2px;
+        }
+
+        .contact-info p {
+            line-height: 1.8;
+            margin-bottom: 20px;
+            color: #555;
+            font-size: 16px;
+        }
+
+        .contact-details {
+            margin-top: 30px;
+        }
+
+        .contact-details li {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            list-style: none;
+        }
+
+        .contact-details i {
+            width: 40px;
+            height: 40px;
+            background-color: rgba(66, 133, 244, 0.1);
+            color: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .contact-details h3 {
+            font-size: 18px;
+            margin-bottom: 5px;
+            color: var(--dark);
+        }
+
+        .contact-details p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .contact-form {
+            flex: 1;
+            background-color: #f5f7fa;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .contact-form h3 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+
+        .contact-form input,
+        .contact-form textarea {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .contact-form input:focus,
+        .contact-form textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
+        }
+
+        .contact-form textarea {
+            resize: vertical;
+            min-height: 150px;
+        }
+
+        .contact-form button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .contact-form button:hover {
+            background-color: #3b78e7;
+            transform: translateY(-2px);
+        }
+
+        /* Map Section */
+        .map {
+            height: 400px;
+            background-color: #f5f7fa;
+            margin-top: 50px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .map iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--dark);
+            color: white;
+            padding: 60px 0 30px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-col h3 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .footer-col h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background-color: var(--primary);
+        }
+
+        .footer-col p {
+            line-height: 1.8;
+            margin-bottom: 20px;
+            color: #aaa;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-links a {
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .social-links a:hover {
+            background-color: var(--primary);
+            transform: translateY(-5px);
+        }
+
+        .quick-links li {
+            margin-bottom: 10px;
+            list-style: none;
+        }
+
+        .quick-links a {
+            color: #aaa;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .quick-links a:hover {
+            color: white;
+            padding-left: 5px;
+        }
+
+        .quick-links a i {
+            font-size: 12px;
+            color: var(--primary);
+        }
+
+        .contact-info li {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            list-style: none;
+        }
+
+        .contact-info i {
+            color: var(--primary);
+            font-size: 18px;
+        }
+
+        .contact-text {
+            color: #aaa;
+            line-height: 1.5;
+        }
+
+        .newsletter p {
+            margin-bottom: 20px;
+        }
+
+        .newsletter-form {
+            position: relative;
+        }
+
+        .newsletter-form input {
+            width: 100%;
+            padding: 15px;
+            border-radius: 50px;
+            border: none;
+            outline: none;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .newsletter-form input::placeholder {
+            color: #aaa;
+        }
+
+        .newsletter-form button {
+            position: absolute;
+            right: 5px;
+            top: 5px;
+            bottom: 5px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 0 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .newsletter-form button:hover {
+            background-color: #3b78e7;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 992px) {
+            .contact-container {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 36px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .page-title {
+                font-size: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header id="header">
+        <div class="container header-container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-heartbeat"></i>
+                <span>Medicare</span>
+            </a>
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('index') }}">Home</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle">About Us<i class="fa fa-angle-down"></i></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="{{ url_for('about') }}">About Us</a></li>
+                            <li><a href="{{ url_for('team') }}">Our Team</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="{{ url_for('services') }}">Services</a></li>
+                    <li><a href="{{ url_for('contact') }}">Contact</a></li>
+
+                </ul>
+            </nav>
+            <a href="{{ url_for('book') }}" class="book-btn">Book Appointment</a>
+            <li><a href="{{ url_for('login') }}" class="login-btn">Admin Login</a></li>
+    </header>
+
+
+    <!-- Page Banner -->
+    <section class="page-banner">
+        <div class="container">
+            <h1 class="page-title">Contact Us</h1>
+            <div class="breadcrumb">
+                <a href="{{ url_for('index') }}">Home</a>
+                <span class="separator">></span>
+                <span>Contact</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact">
+        <div class="container contact-container">
+            <div class="contact-info fade-in">
+                <h2>Get in Touch</h2>
+                <p>We’re here to help! Whether you have questions about our services, need assistance, or want to schedule an appointment, our team is ready to assist you.</p>
+                <div class="contact-details">
+                    <li>
+                        <i class="fas fa-map-marker-alt"></i>
+                        <div>
+                            <h3>Our Location</h3>
+                            <p>123 Medicare Avenue, Medical District<br>Nakuru, Kenya 10001</p>
+                        </div>
+                    </li>
+                    <li>
+                        <i class="fas fa-phone"></i>
+                        <div>
+                            <h3>Call Us</h3>
+                            <p>254 743371171</p>
+                        </div>
+                    </li>
+                    <li>
+                        <i class="fas fa-envelope"></i>
+                        <div>
+                            <h3>Email Us</h3>
+                            <p>info@medicare.com</p>
+                        </div>
+                    </li>
+                </div>
+            </div>
+            <div class="contact-form fade-in">
+                <h3>Send Us a Message</h3>
+                <form>
+                    <input type="text" placeholder="Your Name" required>
+                    <input type="email" placeholder="Your Email" required>
+                    <input type="text" placeholder="Subject" required>
+                    <textarea placeholder="Your Message" required></textarea>
+                    <button type="submit">Send Message</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Map Section -->
+    <section class="map fade-in">
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3022.183792036752!2d-73.9961596845941!3d40.748440479327!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c259a9b3117469%3A0xd134e199a405a163!2sEmpire%20State%20Building!5e0!3m2!1sen!2sus!4v1629999999999!5m2!1sen!2sus" allowfullscreen="" loading="lazy"></iframe>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contact">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-col">
+                    <h3>About Medicare</h3>
+                    <p>Medicare Medical Clinic is committed to providing exceptional healthcare services in a comfortable and caring environment. We combine medical expertise with advanced technology to ensure the best possible outcomes for our patients.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h3>Quick Links</h3>
+                    <ul class="quick-links">
+                        <li><a href="{{ url_for('index') }}"><i class="fas fa-chevron-right"></i> Home</a></li>
+                        <li><a href="{{ url_for('about') }}"><i class="fas fa-chevron-right"></i> About Us</a></li>
+                        <li><a href="{{ url_for('services') }}"><i class="fas fa-chevron-right"></i> Services</a></li>
+                        <li><a href="{{ url_for('team') }}"><i class="fas fa-chevron-right"></i> Our Doctors</a></li>
+                        <li><a href="{{ url_for('book') }}"><i class="fas fa-chevron-right"></i> Book Appointment</a></li>
+                        <li><a href="{{ url_for('contact') }}"><i class="fas fa-chevron-right"></i> Contact Us</a></li>
+                        <li><a href="privacy.html"><i class="fas fa-chevron-right"></i> Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h3>Contact Info</h3>
+                    <ul class="contact-info">
+                        <li>
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span class="contact-text">123 Medicare Avenue, Medical District<br>Nakuru, Kenya 10001</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-phone-alt"></i>
+                            <span class="contact-text">254 743371171<br>254 745211657</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-envelope"></i>
+                            <span class="contact-text">info@medicareclinic.com<br>appointments@medicareclinic.com</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h3>Newsletter</h3>
+                    <p>Subscribe to our newsletter to receive the latest health tips, news, and updates from our clinic.</p>
+                    <form class="newsletter-form">
+                        <input type="email" placeholder="Enter your email">
+                        <button type="submit">Subscribe</button>
+                    </form>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Medicare Medical Clinic. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+      <!-- Scripts -->
+      <script>
+        // Fade-in animation on scroll
+        const fadeElements = document.querySelectorAll('.fade-in');
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        fadeElements.forEach(element => {
+            observer.observe(element);
+        });
+
+        // Header scroll effect
+        const header = document.getElementById('header');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+    </script>
+</body>
+</html>

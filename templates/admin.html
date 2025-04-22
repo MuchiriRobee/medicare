@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="admin-container fade-in">
+    <p>Welcome, {{ session['username'] }}! Here are the appointments made by users.</p>
+
+    <div class="appointments-table slide-in">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Full Name</th>
+                    <th>Phone Number</th>
+                    <th>Email</th>
+                    <th>Home Address</th>
+                    <th>Appointment Date</th>
+                    <th>Service</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                {% for appointment in appointments %}
+                <tr>
+                    <td>{{ appointment.id }}</td>
+                    <td>{{ appointment.full_name }}</td>
+                    <td>{{ appointment.phone_number }}</td>
+                    <td>{{ appointment.email }}</td>
+                    <td>{{ appointment.home_address }}</td>
+                    <td>{{ appointment.appointment_date }}</td>
+                    <td>{{ appointment.service_name }}</td>
+
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <a href="{{ url_for('logout') }}" class="logout-button">Logout</a>
+</div>
+{% endblock %}

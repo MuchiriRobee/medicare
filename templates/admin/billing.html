@@ -1,0 +1,212 @@
+{% extends 'admin/admin_base.html' %}
+
+{% block content %}
+<div class="billing-container">
+    <h1>Billing and Payment</h1>
+    <p>Patient Name: {{ invoice.patient_name }}</p>
+    <p>Total Amount: ${{ invoice.total_price }}</p>
+
+    <h2>Items</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Drug Name</th>
+                <th>Quantity</th>
+                <th>Price per Unit</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td>{{ item.drug_name }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>${{ item.price }}</td>
+                <td>${{ item.total }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Payment Modes -->
+    <div class="payment-modes">
+        <!-- M-Pesa Payment -->
+        <div class="payment-mode">
+            <h2>M-Pesa Payment</h2>
+            <form id="mpesaForm">
+                <label for="mpesa_number">M-Pesa Number:</label>
+                <input type="tel" id="mpesa_number" name="mpesa_number" placeholder="Enter M-Pesa number" required>
+                <button type="button" id="payWithMpesa">Pay with M-Pesa</button>
+            </form>
+        </div>
+
+        <!-- Smart Card Payment -->
+        <div class="payment-mode">
+            <h2>Smart Card Payment</h2>
+            <form id="smartCardForm">
+                <label for="card_number">Card Number:</label>
+                <input type="text" id="card_number" name="card_number" placeholder="Enter card number" required>
+                <label for="card_pin">Card PIN:</label>
+                <input type="password" id="card_pin" name="card_pin" placeholder="Enter card PIN" required>
+                <button type="button" id="payWithSmartCard">Pay with Smart Card</button>
+            </form>
+        </div>
+
+        <!-- Insurance Payment -->
+        <div class="payment-mode">
+            <h2>Insurance Payment</h2>
+            <form id="insuranceForm">
+                <label for="insurance_provider">Insurance Provider:</label>
+                <input type="text" id="insurance_provider" name="insurance_provider" placeholder="Enter insurance provider" required>
+                <label for="policy_number">Policy Number:</label>
+                <input type="text" id="policy_number" name="policy_number" placeholder="Enter policy number" required>
+                <button type="button" id="payWithInsurance">Pay with Insurance</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Payment Status -->
+    <div id="paymentStatus">
+        <h2>Payment Status</h2>
+        <p id="statusMessage">No payment initiated.</p>
+    </div>
+</div>
+
+<script>
+    // Handle M-Pesa Payment
+    document.getElementById('payWithMpesa').addEventListener('click', function () {
+        const mpesaNumber = document.getElementById('mpesa_number').value.trim();
+
+        if (!mpesaNumber) {
+            alert('Please enter a valid M-Pesa number.');
+            return;
+        }
+
+        // Simulate M-Pesa STK push (for now)
+        document.getElementById('statusMessage').textContent = 'Sending STK push to ' + mpesaNumber + '...';
+
+        // Simulate payment completion
+        setTimeout(() => {
+            document.getElementById('statusMessage').textContent = 'Payment successful via M-Pesa!';
+            // Redirect to a success page or update the invoice status
+            window.location.href = '/admin/payment_success';
+        }, 3000);
+    });
+
+    // Handle Smart Card Payment
+    document.getElementById('payWithSmartCard').addEventListener('click', function () {
+        const cardNumber = document.getElementById('card_number').value.trim();
+        const cardPin = document.getElementById('card_pin').value.trim();
+
+        if (!cardNumber || !cardPin) {
+            alert('Please enter card number and PIN.');
+            return;
+        }
+
+        // Simulate Smart Card payment processing
+        document.getElementById('statusMessage').textContent = 'Processing Smart Card payment...';
+
+        // Simulate payment completion
+        setTimeout(() => {
+            document.getElementById('statusMessage').textContent = 'Payment successful via Smart Card!';
+            // Redirect to a success page or update the invoice status
+            window.location.href = '/admin/payment_success';
+        }, 3000);
+    });
+
+    // Handle Insurance Payment
+    document.getElementById('payWithInsurance').addEventListener('click', function () {
+        const insuranceProvider = document.getElementById('insurance_provider').value.trim();
+        const policyNumber = document.getElementById('policy_number').value.trim();
+
+        if (!insuranceProvider || !policyNumber) {
+            alert('Please enter insurance provider and policy number.');
+            return;
+        }
+
+        // Simulate Insurance payment processing
+        document.getElementById('statusMessage').textContent = 'Processing Insurance payment...';
+
+        // Simulate payment completion
+        setTimeout(() => {
+            document.getElementById('statusMessage').textContent = 'Payment successful via Insurance!';
+            // Redirect to a success page or update the invoice status
+            window.location.href = '/admin/payment_success';
+        }, 3000);
+    });
+</script>
+
+<style>
+    .billing-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .payment-modes {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        margin-top: 20px;
+    }
+
+    .payment-mode {
+        flex: 1;
+        min-width: 250px;
+        padding: 20px;
+        background-color: #f9f9f9;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .payment-mode h2 {
+        margin-bottom: 15px;
+        color: #007bff;
+    }
+
+    .payment-mode label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: bold;
+    }
+
+    .payment-mode input {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
+
+    .payment-mode button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: background-color 0.3s ease;
+    }
+
+    .payment-mode button:hover {
+        background-color: #0056b3;
+    }
+
+    #paymentStatus {
+        margin-top: 30px;
+        padding: 20px;
+        background-color: #f9f9f9;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    #statusMessage {
+        font-size: 1.2rem;
+        color: #333;
+    }
+</style>
+{% endblock %}

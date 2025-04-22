@@ -1,0 +1,35 @@
+{% extends 'admin/admin_base.html' %}
+
+{% block content %}
+<div class="invoice-container">
+    <h1>Invoice</h1>
+    <p>Patient Name: {{ invoice.patient_name }}</p>
+
+    <h2>Items</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Drug Name</th>
+                <th>Quantity</th>
+                <th>Price per Unit</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td>{{ item.drug_name }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>${{ item.price }}</td>
+                <td>${{ item.total }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Total Price: ${{ invoice.total_price }}</h2>
+
+    <!-- Redirect to Billing Page with Invoice ID -->
+    <button onclick="window.location.href='/admin/billing/{{ invoice.id }}'">Proceed to Payment</button>
+</div>
+{% endblock %}

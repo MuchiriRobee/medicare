@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- font awesome cdn link -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fontawesome.com/v4/icons/">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    
+        <!-- Navbar -->
+        <header class="header">
+            <div class="homelogo">
+                <a href="#"><i class="fas fa-heartbeat">Medicare Clinic</i></a>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('admin_appointments') }}">Appointments</a></li>
+                    <li><a href="{{ url_for('admin_reports') }}">Reports</a></li>
+                    <li><a href="{{ url_for('admin_pos') }}">Point of Sale</a></li>
+                    <li><a href="{{ url_for('admin_stock') }}">Stock Management</a></li>
+
+
+                </ul>
+            </nav>
+            <a href="{{ url_for('logout') }}" class="logout">Logout</a>
+        
+        </header>
+    
+        <!-- Main Content -->
+        <div class="main-content">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </div>
+    
+    <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+</body>
+</html>
