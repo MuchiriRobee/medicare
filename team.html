@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medicare Clinic</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Reuse the same styles from the About Us page */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #4285f4;
+            --secondary: #34a853;
+            --accent: #ea4335;
+            --light: #f8f9fa;
+            --dark: #202124;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 70px;
+        }
+
+        body {
+            overflow-x: hidden;
+            background-color: var(--light);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        .dropdown {
+    position: relative;
+}
+
+.dropdown-toggle {
+    display: block;
+    color: var(--dark);
+    font-weight: 500;
+    font-size: 16px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.dropdown-toggle:hover {
+    background-color:  rgba(255, 255, 255, 0.1);
+}
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color:  rgba(255, 255, 255, 0.1);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 200px;
+    z-index: 1000;
+}
+
+.dropdown-menu li {
+    padding: 10px;
+}
+
+.dropdown-menu li a {
+    color: rgb(8, 8, 8);
+    text-decoration: none;
+    font-size: 1rem;
+    display: block;
+}
+
+.dropdown-menu li a:hover {
+    background-color:  rgba(255, 255, 255, 0.1);
+}
+
+.dropdown:hover .dropdown-menu {
+    display: block;
+}
+        /* Header Styles */
+        header {
+            background-color: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            width: 100%;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        header.scrolled {
+            background-color: white;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 24px;
+            text-decoration: none;
+        }
+
+        .logo i {
+            color: var(--secondary);
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            transition: color 0.3s ease;
+            font-size: 16px;
+        }
+
+        nav a:hover {
+            color: var(--primary);
+        }
+
+        .book-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .book-btn:hover {
+            background-color: #3b78e7;
+            transform: translateY(-2px);
+        }
+        .login-btn{
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .login-btn:hover{
+            background-color: #3b78e7;
+            transform: translateY(-2px);
+        } 
+        /* Page Banner */
+        .page-banner {
+            height: 100vh;
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('static/images/docteam.jpg') center/cover no-repeat;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+        }
+
+        .breadcrumb {
+            margin-top: 15px;
+            font-size: 16px;
+        }
+
+        .breadcrumb a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .breadcrumb a:hover {
+            color: white;
+        }
+
+        .breadcrumb .separator {
+            margin: 0 10px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .page-title {
+            font-size: 48px;
+            margin-bottom: 10px;
+            animation: fadeInUp 1s ease;
+        }
+
+        /* Team Section */
+        .team {
+            padding: 100px 0;
+            background-color: #f5f7fa;
+        }
+
+        .center-title {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .center-title h2 {
+            display: inline-block;
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        .center-title h2::after {
+            content: '';
+            position: absolute;
+            width: 70px;
+            height: 4px;
+            background-color: var(--primary);
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 2px;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        .team-card {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .team-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .team-img {
+            position: relative;
+            overflow: hidden;
+            height: 280px;
+        }
+
+        .team-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .team-card:hover .team-img img {
+            transform: scale(1.05);
+        }
+
+        .team-social {
+            position: absolute;
+            bottom: -50px;
+            left: 0;
+            width: 100%;
+            padding: 15px;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .team-card:hover .team-social {
+            bottom: 0;
+        }
+
+        .team-social a {
+            width: 35px;
+            height: 35px;
+            background-color: white;
+            color: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .team-social a:hover {
+            background-color: var(--primary);
+            color: white;
+            transform: translateY(-5px);
+        }
+
+        .team-info {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .team-info h3 {
+            font-size: 20px;
+            margin-bottom: 5px;
+            color: var(--dark);
+        }
+
+        .team-info p {
+            color: #666;
+            font-style: italic;
+            margin-bottom: 10px;
+        }
+
+        .team-info .bio {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #777;
+        }
+        /* Footer */
+        footer {
+            background-color: var(--dark);
+            color: white;
+            padding: 60px 0 30px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-col h3 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .footer-col h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background-color: var(--primary);
+        }
+
+        .footer-col p {
+            line-height: 1.8;
+            margin-bottom: 20px;
+            color: #aaa;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-links a {
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .social-links a:hover {
+            background-color: var(--primary);
+            transform: translateY(-5px);
+        }
+
+        .quick-links li {
+            margin-bottom: 10px;
+            list-style: none;
+        }
+
+        .quick-links a {
+            color: #aaa;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .quick-links a:hover {
+            color: white;
+            padding-left: 5px;
+        }
+
+        .quick-links a i {
+            font-size: 12px;
+            color: var(--primary);
+        }
+
+        .contact-info li {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            list-style: none;
+        }
+
+        .contact-info i {
+            color: var(--primary);
+            font-size: 18px;
+        }
+
+        .contact-text {
+            color: #aaa;
+            line-height: 1.5;
+        }
+
+        .newsletter p {
+            margin-bottom: 20px;
+        }
+
+        .newsletter-form {
+            position: relative;
+        }
+
+        .newsletter-form input {
+            width: 100%;
+            padding: 15px;
+            border-radius: 50px;
+            border: none;
+            outline: none;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .newsletter-form input::placeholder {
+            color: #aaa;
+        }
+
+        .newsletter-form button {
+            position: absolute;
+            right: 5px;
+            top: 5px;
+            bottom: 5px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 0 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .newsletter-form button:hover {
+            background-color: #3b78e7;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+       
+        /* Responsive Styles */
+        @media (max-width: 900px) {
+            .about-content {
+                flex-direction: column;
+            }
+            .map-container {
+                flex-direction: column;
+            }
+            .location-info {
+                padding-left: 0;
+                margin-top: 30px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                text-align: center;
+                padding: 15px;
+            }
+            nav ul {
+                margin-top: 15px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .hero h1 {
+                font-size: 36px;
+            }
+            .section-title h2 {
+                font-size: 30px;
+            }
+            .about-text h3,
+            .location-info h3 {
+                font-size: 24px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-btns {
+                flex-direction: column;
+                width: 100%;
+            }
+            .book-btn, .secondary-btn {
+                width: 100%;
+                text-align: center;
+            }
+            nav ul {
+                gap: 15px;
+            }
+            .hero h1 {
+                font-size: 30px;
+            }
+        }
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 36px;
+            }
+            .team-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+        }
+
+        @media (max-width: 480px) {
+            .page-title {
+                font-size: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header id="header">
+        <div class="container header-container">
+            <a href="#" class="logo">
+                <i class="fas fa-heartbeat"></i>
+                <span>Medicare Clinic</span>
+            </a>
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('index') }}">Home</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle">About Us<i class="fa fa-angle-down"></i></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="{{ url_for('about') }}">About Us</a></li>
+                            <li><a href="{{ url_for('team') }}">Our Team</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="{{ url_for('services') }}">Services</a></li>
+                    <li><a href="{{ url_for('contact') }}">Contact</a></li>
+
+                </ul>
+            </nav>
+            <a href="{{ url_for('book') }}" class="book-btn">Book Appointment</a>
+            <li><a href="{{ url_for('login') }}" class="login-btn">Admin Login</a></li>
+
+        </div>
+    </header>
+    <!-- Page Banner -->
+    <section class="page-banner">
+        <div class="container">
+            <h1 class="page-title">Meet Our Team</h1>
+            <div class="breadcrumb">
+                <a href="{{ url_for('index') }}">Home</a>
+                <span class="separator">></span>
+                <span>Our Team</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section class="team">
+        <div class="container">
+            <div class="section-title center-title">
+                <h2>Our Medical Professionals</h2>
+            </div>
+            <div class="team-grid">
+                <div class="team-card fade-in">
+                    <div class="team-img">
+                        <img src="static/images/mang2.jpg" alt="Dr. Sarah Johnson">
+                        <div class="team-social">
+                            <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                            <a href="#"><i class="fas fa-envelope"></i></a>
+                        </div>
+                    </div>
+                    <div class="team-info">
+                        <h3>Dr. Sarah Johnson</h3>
+                        <p>Founder & CEO</p>
+                        <div class="bio">
+                            Dr. Sarah Johnson is a board-certified physician with over 20 years of experience in internal medicine. She founded HealthPoint with a vision to create a patient-centered healthcare environment.
+                        </div>
+                    </div>
+                </div>
+                <div class="team-card fade-in">
+                    <div class="team-img">
+                        <img src="static/images/CMO.jpg" alt="Dr. Michael Lee">
+                        <div class="team-social">
+                            <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                            <a href="#"><i class="fas fa-envelope"></i></a>
+                        </div>
+                    </div>
+                    <div class="team-info">
+                        <h3>Dr. Michael Lee</h3>
+                        <p>Cardiologist</p>
+                        <div class="bio">
+                            Dr. Michael Lee specializes in cardiology and preventive care. He is dedicated to helping patients achieve optimal heart health through personalized treatment plans.
+                        </div>
+                    </div>
+                </div>
+                <div class="team-card fade-in">
+                    <div class="team-img">
+                        <img src="static/images/nurse.jpg" alt="Dr. Emily Carter">
+                        <div class="team-social">
+                            <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                            <a href="#"><i class="fas fa-envelope"></i></a>
+                        </div>
+                    </div>
+                    <div class="team-info">
+                        <h3>Dr. Emily Carter</h3>
+                        <p>Pediatrician</p>
+                        <div class="bio">
+                            Dr. Emily Carter is passionate about pediatric care and ensuring the well-being of children. She provides compassionate and comprehensive care for young patients.
+                        </div>
+                    </div>
+                </div>
+                <div class="team-card fade-in">
+                    <div class="team-img">
+                        <img src="static/images/CFO.jpg" alt="Dr. David Martinez">
+                        <div class="team-social">
+                            <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                            <a href="#"><i class="fas fa-envelope"></i></a>
+                        </div>
+                    </div>
+                    <div class="team-info">
+                        <h3>Dr. David Martinez</h3>
+                        <p>Orthopedic Surgeon</p>
+                        <div class="bio">
+                            Dr. David Martinez specializes in orthopedic surgery and sports medicine. He is committed to helping patients regain mobility and live active lives.
+                        </div>
+                    </div>
+                </div>
+                <div class="team-card fade-in">
+                    <div class="team-img">
+                        <img src="static/images/dentist.jpg" alt="Dr. Linda Chen">
+                        <div class="team-social">
+                            <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                            <a href="#"><i class="fas fa-envelope"></i></a>
+                        </div>
+                    </div>
+                    <div class="team-info">
+                        <h3>Dr. Linda Chen</h3>
+                        <p>Dentist Surgeon</p>
+                        <div class="bio">
+                            Dr. Linda Chen specializes in dental surgery and oral health in general. She is committed to helping patients keep their gums safe and their teeth in perfect health.
+                        </div>
+                    </div>
+                </div>
+                <div class="team-card fade-in">
+                    <div class="team-img">
+                        <img src="static/images/ENT.jpg" alt="Dr. Anna Mwende">
+                        <div class="team-social">
+                            <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                            <a href="#"><i class="fas fa-envelope"></i></a>
+                        </div>
+                    </div>
+                    <div class="team-info">
+                        <h3>Dr. Anna Mwende</h3>
+                        <p>ENT Specialist</p>
+                        <div class="bio">
+                            Dr. Anna Mwende treats hearing and balance, swallowing and speech, breathing and sleep issues, allergies and sinuses, head and neck cancer, skin disorders, even facial plastic surgery.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+   <!-- Footer -->
+   <footer id="contact">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-col">
+                <h3>About Medicare</h3>
+                <p>Medicare Medical Clinic is committed to providing exceptional healthcare services in a comfortable and caring environment. We combine medical expertise with advanced technology to ensure the best possible outcomes for our patients.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h3>Quick Links</h3>
+                <ul class="quick-links">
+                    <li><a href="{{ url_for('index') }}"><i class="fas fa-chevron-right"></i> Home</a></li>
+                    <li><a href="{{ url_for('about') }}"><i class="fas fa-chevron-right"></i> About Us</a></li>
+                    <li><a href="{{ url_for('services') }}"><i class="fas fa-chevron-right"></i> Services</a></li>
+                    <li><a href="{{ url_for('team') }}"><i class="fas fa-chevron-right"></i> Our Doctors</a></li>
+                    <li><a href="{{ url_for('book') }}"><i class="fas fa-chevron-right"></i> Book Appointment</a></li>
+                    <li><a href="{{ url_for('contact') }}"><i class="fas fa-chevron-right"></i> Contact Us</a></li>
+                    <li><a href="privacy.html"><i class="fas fa-chevron-right"></i> Privacy Policy</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h3>Contact Info</h3>
+                <ul class="contact-info">
+                    <li>
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span class="contact-text">123 Medicare Avenue, Medical District<br>Nakuru, Kenya 10001</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-phone-alt"></i>
+                        <span class="contact-text">254 743371171<br>254 745211657</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-envelope"></i>
+                        <span class="contact-text">info@medicareclinic.com<br>appointments@medicareclinic.com</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h3>Newsletter</h3>
+                <p>Subscribe to our newsletter to receive the latest health tips, news, and updates from our clinic.</p>
+                <form class="newsletter-form">
+                    <input type="email" placeholder="Enter your email">
+                    <button type="submit">Subscribe</button>
+                </form>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 Medicare Medical Clinic. All Rights Reserved.</p>
+        </div>
+    </div>
+</footer>
+
+    <!-- Scripts -->
+    <script>
+        // Fade-in animation on scroll
+        const fadeElements = document.querySelectorAll('.fade-in');
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        fadeElements.forEach(element => {
+            observer.observe(element);
+        });
+
+        // Header scroll effect
+        const header = document.getElementById('header');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+    </script>
+</body>
+</html>

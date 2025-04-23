@@ -1,0 +1,23 @@
+{% extends 'admin/admin_base.html' %}
+
+{% block content %}
+<div class="stock-container">
+    <h1>Stock Management</h1>
+    <form id="stockForm" method="POST" action="{{ url_for('update_stock') }}">
+        <label for="drug_id">Select Drug:</label>
+        <select id="drug_id" name="drug_id" required>
+            <option value="">-- Select a Drug --</option>
+            {% for drug in drugs %}
+            <option value="{{ drug.id }}">{{ drug.name }} (Current Stock: {{ drug.quantity }})</option>
+            {% endfor %}
+        </select>
+
+        <label for="quantity_to_add">Quantity to Add:</label>
+        <input type="number" id="quantity_to_add" name="quantity_to_add" required min="1">
+
+        <button type="submit">Update Stock</button>
+    </form>
+
+    
+</div>
+{% endblock %}

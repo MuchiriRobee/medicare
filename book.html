@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="book_container">
+    <h1>Book an Appointment with us</h1>
+<form method="POST" class="bookappointment" id="bookingForm">
+    <label for="full_name">Full Name:</label>
+    <input type="text" id="full_name" name="full_name" required>
+
+    <label for="phone_number">Phone Number:</label>
+    <input type="tel" id="phone_number" name="phone_number" required>
+
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" required>
+
+    <label for="home_address">Home Address:</label>
+    <textarea id="home_address" name="home_address" required></textarea>
+
+    <label for="appointment_date">Appointment Date:</label>
+    <input type="date" id="appointment_date" name="appointment_date" required>
+    
+    <label for="service_id">Select Service:</label>
+    <select id="service_id" name="service_id" required>
+        <option value="">-- Select a Service --</option>
+        {% for service in services %}
+        <option value="{{ service.id }}">{{ service.name }}</option>
+        {% endfor %}
+    </select>
+    
+   <label for="receive_notifications">
+        <input type="checkbox" id="receive_notifications" name="receive_notifications" checked>
+        Receive email notifications
+    </label>
+
+    <button type="submit">Book Appointment</button>
+</form>
+<!-- Confirmation Modal -->
+<div id="confirmationModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Appointment Booked Successfully!</h2>
+        <p>Thank you for booking an appointment with us. We will contact you shortly.</p>
+    </div>
+</div>
+</div>
+
+{% endblock %}

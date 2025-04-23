@@ -1,0 +1,197 @@
+{% extends 'admin/admin_base.html' %}
+
+{% block content %}
+<div class="pos-container">
+    <h1>Point of Sale</h1>
+    <form id="posForm">
+        <!-- Patient Name -->
+        <label for="patient_name">Patient Name:</label>
+        <input type="text" id="patient_name" name="patient_name" required>
+
+        <!-- Drug Search -->
+        <label for="drug_search">Search Drug:</label>
+        <input type="text" id="drug_search" name="drug_search" placeholder="Search for a drug..." required>
+        <div id="drug_results"></div> <!-- Container for search results -->
+
+        <!-- Quantity -->
+        <label for="quantity">Quantity:</label>
+        <input type="number" id="quantity" name="quantity" required>
+
+        <!-- Price and Available Quantity (Read-only) -->
+        <label for="price">Price per Unit:</label>
+        <input type="number" id="price" name="price" step="0.01" required readonly>
+
+        <label for="available_quantity">Available Quantity:</label>
+        <input type="number" id="available_quantity" name="available_quantity" readonly>
+
+        <!-- Add Drug Button -->
+        <button type="button" id="addDrug">Add Drug</button>
+
+        <!-- Selected Drugs List -->
+        <div id="selected_drugs">
+            <h3>Selected Drugs</h3>
+            <ul id="drug_list"></ul>
+        </div>
+
+        <!-- Total Price -->
+        <div id="total_price">
+            <h3>Total Price: $<span id="total_price_value">0.00</span></h3>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="button" id="generateInvoice">Generate Invoice</button>
+    </form>
+</div>
+
+<script>
+    let selectedDrugs = [];
+
+    // Fetch drugs from the server as the user types
+    document.getElementById('drug_search').addEventListener('input', function () {
+        const searchTerm = this.value.trim();
+
+        if (searchTerm.length >= 2) { // Only search if the user has typed at least 2 characters
+            fetch(`/search_drugs?query=${searchTerm}`)
+                .then(response => response.json())
+                .then(data => {
+                    const resultsContainer = document.getElementById('drug_results');
+                    resultsContainer.innerHTML = ''; // Clear previous results
+
+                    if (data.length > 0) {
+                        data.forEach(drug => {
+                            const drugOption = document.createElement('div');
+                            drugOption.className = 'drug-option';
+                            drugOption.textContent = `${drug.name} (Price: $${drug.price}, Quantity: ${drug.quantity})`;
+                            drugOption.setAttribute('data-id', drug.id);
+                            drugOption.setAttribute('data-price', drug.price);
+                            drugOption.setAttribute('data-quantity', drug.quantity);
+
+                            // Auto-fill price and quantity when a drug is selected
+                            drugOption.addEventListener('click', () => {
+                                document.getElementById('drug_search').value = drug.name;
+                                document.getElementById('price').value = drug.price;
+                                document.getElementById('available_quantity').value = drug.quantity;
+                                resultsContainer.innerHTML = ''; // Clear results after selection
+                            });
+
+                            resultsContainer.appendChild(drugOption);
+                        });
+                    } else {
+                        resultsContainer.innerHTML = '<div class="no-results">No drugs found.</div>';
+                    }
+                });
+        } else {
+            document.getElementById('drug_results').innerHTML = ''; // Clear results if search term is too short
+        }
+    });
+
+    // Add drug to the selected list
+    document.getElementById('addDrug').addEventListener('click', function () {
+        const drugName = document.getElementById('drug_search').value;
+        const quantity = parseInt(document.getElementById('quantity').value);
+        const price = parseFloat(document.getElementById('price').value);
+        const availableQuantity = parseInt(document.getElementById('available_quantity').value);
+
+        if (quantity > availableQuantity) {
+            alert('Error: The selected quantity exceeds the available stock.');
+            return;
+        }
+
+        const drug = {
+            name: drugName,
+            quantity: quantity,
+            price: price,
+            total: quantity * price
+        };
+
+        selectedDrugs.push(drug);
+        updateSelectedDrugsList();
+        updateTotalPrice();
+    });
+
+    // Update the selected drugs list
+    function updateSelectedDrugsList() {
+        const drugList = document.getElementById('drug_list');
+        drugList.innerHTML = '';
+
+        selectedDrugs.forEach((drug, index) => {
+            const li = document.createElement('li');
+            li.textContent = `${drug.name} - Quantity: ${drug.quantity} - Price: $${drug.total.toFixed(2)}`;
+            drugList.appendChild(li);
+        });
+    }
+
+    // Update the total price
+    function updateTotalPrice() {
+        const totalPrice = selectedDrugs.reduce((sum, drug) => sum + drug.total, 0);
+        document.getElementById('total_price_value').textContent = totalPrice.toFixed(2);
+    }
+
+    // Handle form submission
+    document.getElementById('generateInvoice').addEventListener('click', function () {
+        const patientName = document.getElementById('patient_name').value;
+
+        if (selectedDrugs.length === 0) {
+            alert('Please add at least one drug.');
+            return;
+        }
+
+        // Send data to the server as JSON
+        fetch('/admin/invoice', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                patient_name: patientName,
+                items: selectedDrugs
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.href = `/admin/invoice/${data.invoice_id}`; // Redirect to the invoice page
+            } else {
+                alert('Error generating invoice.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while generating the invoice.');
+        });
+    });
+</script>
+
+<style>
+    /* Style for search results */
+    #drug_results {
+        border: 1px solid #ddd;
+        max-height: 150px;
+        overflow-y: auto;
+        margin-top: 10px;
+    }
+
+    .drug-option {
+        padding: 10px;
+        cursor: pointer;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .drug-option:hover {
+        background-color: #f1f1f1;
+    }
+
+    .no-results {
+        padding: 10px;
+        color: #777;
+    }
+
+    #selected_drugs {
+        margin-top: 20px;
+    }
+
+    #total_price {
+        margin-top: 20px;
+    }
+</style>
+{% endblock %}

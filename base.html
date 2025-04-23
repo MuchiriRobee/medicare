@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <!-- font awesome cdn link -->
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+     <link rel="stylesheet" href="https://fontawesome.com/v4/icons/">
+
+     <title>Medicare Clinic</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <header class="header">
+        <div class="header-container">
+            <div class="homelogo">
+                <a href="#"><i class="fas fa-heartbeat">Medicare Clinic</i></a>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('index') }}">Home</a></li>
+                    <li><a href="{{ url_for('services') }}">Services</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle">About Us<i class="fa fa-angle-down"></i></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="{{ url_for('about') }}">About Us</a></li>
+                            <li><a href="{{ url_for('team') }}">Our Team</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="{{ url_for('contact') }}">Contact</a></li>
+                    <li><a href="{{ url_for('book') }}">Book Appointment</a></li>
+                    <li><a href="{{ url_for('login') }}">Admin Login</a></li>
+                    <li><a href="{{ url_for('team') }}"></a></li>
+    
+                </ul>
+            </nav>
+        </div>
+
+    </header>
+    <main class="main">
+         <!-- Flash Messages -->
+         {% with messages = get_flashed_messages(with_categories=true) %}
+         {% if messages %}
+             {% for category, message in messages %}
+                 <div class="alert alert-{{ category }}">
+                     {{ message }}
+                 </div>
+             {% endfor %}
+         {% endif %}
+     {% endwith %}
+        {% block content %}{% endblock %}
+    </main>
+    <footer>
+        <div class="footer-container">
+            <div class="footer-about">
+                <h3>MediCare Clinic</h3>
+                <p>Medicare Medical Clinic is committed to providing exceptional healthcare services in a comfortable and caring environment. We combine medical expertise with advanced technology to ensure the best possible outcomes for our patients.</p>
+            </div>
+            
+            <div class="footer-contact">
+                <h3>Contact Information</h3>
+                <ul>
+                    <li><i class="fas fa-phone"></i> +254 743371171</li>
+                    <li><i class="fas fa-envelope"></i> info@medicareclinic.com</li>
+                    <li><i class="fas fa-map-marker-alt"></i> 123 Medicare Avenue, Nakuru,Kenya</li>
+                </ul>
+                <div class="social-icons">
+                    <a href="#" class="social-icon facebook"><i>f</i></a>                    
+                    <a href="#" class="social-icon instagram"><i>📷</i></a>                    
+                    <a href="https://wa.me/254743371171" class="social-icon whatsapp"><i>w</i></a>
+                    <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            
+            <div class="footer-hours">
+                <h3>Working Hours</h3>
+                <p>Monday - Friday: 8:00 AM - 8:00 PM<br>
+                Saturday: 9:00 AM - 5:00 PM<br>
+                Sunday: 10:00 AM - 2:00 PM</p>
+            </div>
+            
+            <div class="footer-links">
+                <h3>Quick links</h3>
+                <ul class="quick-links">
+                    <li><a href="{{ url_for('index') }}"><i class="fas fa-chevron-right"></i> Home</a></li>
+                    <li><a href="{{ url_for('about') }}"><i class="fas fa-chevron-right"></i> About Us</a></li>
+                    <li><a href="{{ url_for('services') }}"><i class="fas fa-chevron-right"></i> Services</a></li>
+                    <li><a href="{{ url_for('team') }}"><i class="fas fa-chevron-right"></i> Our Doctors</a></li>
+                    <li><a href="{{ url_for('book') }}"><i class="fas fa-chevron-right"></i> Book Appointment</a></li>
+                    <li><a href="{{ url_for('contact') }}"><i class="fas fa-chevron-right"></i> Contact Us</a></li>
+                    <li><a href="privacy.html"><i class="fas fa-chevron-right"></i> Privacy Policy</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2025 MediCare Clinic. All Rights Reserved.</p>
+        </div>
+    </footer>
+    <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+</body>
+</html>

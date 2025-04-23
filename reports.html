@@ -1,0 +1,136 @@
+{% extends 'admin/admin_base.html' %}
+
+{% block content %}
+<div class="reports-container">
+    <h1>Patient Reports</h1>
+
+    <!-- Search Box -->
+    <div class="search-box">
+        <input type="text" id="search_patient" placeholder="Search by patient name...">
+        <button id="search_button">Search</button>
+    </div>
+
+    <!-- Report Form -->
+    <form id="reportForm" method="POST" action="{{ url_for('submit_report') }}">
+        <label for="patient_name">Patient Name:</label>
+        <input type="text" id="patient_name" name="patient_name" required>
+
+        <label for="appointment_date">Appointment Date:</label>
+        <input type="date" id="appointment_date" name="appointment_date" required>
+
+        <label for="service_type">Service Type:</label>
+        <input type="text" id="service_type" name="service_type" required>
+
+        <label for="diagnosis">Diagnosis:</label>
+        <textarea id="diagnosis" name="diagnosis" rows="4" required></textarea>
+
+        <label for="prescription">Prescription:</label>
+        <textarea id="prescription" name="prescription" rows="4" required></textarea>
+
+        <label for="follow_up">Follow Up:</label>
+        <textarea id="follow_up" name="follow_up" rows="4" required></textarea>
+
+        <button type="submit">Submit Report</button>
+    </form>
+
+    <!-- List of Matching Reports -->
+    <div id="report_list" class="report-list"></div>
+
+    <!-- Modal for Report Details -->
+    <div id="reportModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modalPatientName"></h2>
+            <p><strong>Appointment Date:</strong> <span id="modalAppointmentDate"></span></p>
+            <p><strong>Service Type:</strong> <span id="modalServiceType"></span></p>
+            <p><strong>Diagnosis:</strong> <span id="modalDiagnosis"></span></p>
+            <p><strong>Prescription:</strong> <span id="modalPrescription"></span></p>
+            <p><strong>Follow Up:</strong> <span id="modalFollowUp"></span></p>
+            <div class="modal-buttons">
+                <button id="editReport">Edit</button>
+                <button id="printReport">Print</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentReportId = null; // Store the ID of the currently displayed report
+
+    // Search for patient reports
+    document.getElementById('search_button').addEventListener('click', function () {
+        const searchTerm = document.getElementById('search_patient').value.trim();
+
+        if (searchTerm) {
+            fetch(`/search_reports?query=${searchTerm}`)
+                .then(response => response.json())
+                .then(data => {
+                    const reportList = document.getElementById('report_list');
+                    reportList.innerHTML = ''; // Clear previous results
+
+                    if (data.length > 0) {
+                        data.forEach(report => {
+                            const reportItem = document.createElement('div');
+                            reportItem.className = 'report-item';
+                            reportItem.textContent = `${report.patient_name} - ${report.appointment_date}`;
+                            reportItem.setAttribute('data-id', report.id);
+
+                            // Show the report details in the modal when clicked
+                            reportItem.addEventListener('click', () => {
+                                currentReportId = report.id; // Store the report ID
+                                document.getElementById('modalPatientName').textContent = report.patient_name;
+                                document.getElementById('modalAppointmentDate').textContent = report.appointment_date;
+                                document.getElementById('modalServiceType').textContent = report.service_type;
+                                document.getElementById('modalDiagnosis').textContent = report.diagnosis;
+                                document.getElementById('modalPrescription').textContent = report.prescription;
+                                document.getElementById('modalFollowUp').textContent = report.follow_up;
+
+                                // Show the modal
+                                document.getElementById('reportModal').style.display = 'block';
+                            });
+
+                            reportList.appendChild(reportItem);
+                        });
+                    } else {
+                        reportList.innerHTML = '<p>No reports found.</p>';
+                    }
+                });
+        }
+    });
+
+    // Close the modal when the close button is clicked
+    document.querySelector('.close').addEventListener('click', function () {
+        document.getElementById('reportModal').style.display = 'none';
+    });
+
+    // Close the modal when clicking outside the modal
+    window.addEventListener('click', function (event) {
+        const modal = document.getElementById('reportModal');
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+
+    // Edit Report
+    document.getElementById('editReport').addEventListener('click', function () {
+        if (currentReportId) {
+            window.location.href = `/edit_report/${currentReportId}`; // Redirect to the edit page
+        }
+    });
+
+    // Print Report
+    document.getElementById('printReport').addEventListener('click', function () {
+        const modalContent = document.querySelector('.modal-content').cloneNode(true);
+        modalContent.querySelector('.modal-buttons').remove(); // Remove buttons for printing
+
+        const printWindow = window.open('', '', 'height=600,width=800');
+        printWindow.document.write('<html><head><title>Print Report</title>');
+        printWindow.document.write('<style>body { font-family: Arial, sans-serif; }</style>');
+        printWindow.document.write('</head><body>');
+        printWindow.document.write(modalContent.innerHTML);
+        printWindow.document.write('</body></html>');
+        printWindow.document.close();
+        printWindow.print();
+    });
+</script>
+{% endblock %}
