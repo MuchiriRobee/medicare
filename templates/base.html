@@ -5,21 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
      <!-- font awesome cdn link -->
      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-     <link rel="stylesheet" href="https://fontawesome.com/v4/icons/">
 
      <title>Medicare Clinic</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 <body>
-    <header class="header">
-        <div class="header-container">
-            <div class="homelogo">
-                <a href="#"><i class="fas fa-heartbeat">Medicare Clinic</i></a>
-            </div>
+    <header id="header">
+        <div class="container header-container">
+            <a href="#" class="logo">
+                <i class="fas fa-heartbeat"></i>
+                <span>Medicare Clinic</span>
+            </a>
             <nav>
                 <ul>
                     <li><a href="{{ url_for('index') }}">Home</a></li>
-                    <li><a href="{{ url_for('services') }}">Services</a></li>
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle">About Us<i class="fa fa-angle-down"></i></a>
                         <ul class="dropdown-menu">
@@ -27,15 +26,15 @@
                             <li><a href="{{ url_for('team') }}">Our Team</a></li>
                         </ul>
                     </li>
+                    <li><a href="{{ url_for('services') }}">Services</a></li>
                     <li><a href="{{ url_for('contact') }}">Contact</a></li>
-                    <li><a href="{{ url_for('book') }}">Book Appointment</a></li>
-                    <li><a href="{{ url_for('login') }}">Admin Login</a></li>
-                    <li><a href="{{ url_for('team') }}"></a></li>
-    
+
                 </ul>
             </nav>
-        </div>
+            <a href="{{ url_for('book') }}" class="book-btn">Book Appointment</a>
+            <li><a href="{{ url_for('login') }}" class="login-btn">Admin Login</a></li>
 
+        </div>
     </header>
     <main class="main">
          <!-- Flash Messages -->
