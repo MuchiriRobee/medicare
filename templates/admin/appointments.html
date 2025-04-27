@@ -3,6 +3,32 @@
 {% block content %}
 <div class="appointments-container">
     <h1>Appointment Records</h1>
+      <!-- Add sorting controls -->
+      <div class="sort-controls">
+        <span>Sort by:</span>
+        <a href="{{ url_for('admin_appointments', sort='nearest') }}" 
+           class="sort-btn {% if sort_type == 'nearest' or not sort_type %}active{% endif %}">
+            Nearest First
+        </a>
+        <a href="{{ url_for('admin_appointments', sort='newest') }}" 
+           class="sort-btn {% if sort_type == 'newest' %}active{% endif %}">
+            Farthest First
+        </a>
+        
+    </div>
+    <div class="filter-controls">
+        <div class="filter-group">
+            <label for="service-filter">Filter by Service:</label>
+            <select id="service-filter" class="filter-select">
+                <option value="all" {% if current_service == 'all' %}selected{% endif %}>All Services</option>
+                {% for service in services %}
+                <option value="{{ service.id }}" {% if current_service == service.id|string %}selected{% endif %}>
+                    {{ service.name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
     <table>
         <thead>
             <tr>
@@ -10,7 +36,9 @@
                 <th>Phone Number</th>
                 <th>Email</th>
                 <th>Home Address</th>
-                <th>Appointment Date</th>
+                <th class="{% if sort_type == 'nearest' or not sort_type %}sorted-asc{% elif sort_type == 'newest' %}sorted-desc{% elif sort_type == 'oldest' %}sorted-asc{% endif %}">
+                    Appointment Date
+                </th>
                 <th>Service</th>
                 <th>Action</th>
             </tr>
@@ -211,6 +239,23 @@ document.addEventListener('DOMContentLoaded', function() {
             successModal.style.display = 'none';
             window.location.reload(); // Reload the page to reflect the changes
         }
+    });
+});
+document.addEventListener('DOMContentLoaded', function() {
+    // Service filter functionality
+    const serviceFilter = document.getElementById('service-filter');
+    serviceFilter.addEventListener('change', function() {
+        const serviceId = this.value;
+        const currentUrl = new URL(window.location.href);
+        
+        // Update the service parameter in the URL
+        currentUrl.searchParams.set('service', serviceId);
+        
+        // Keep the current sort type
+        currentUrl.searchParams.set('sort', '{{ sort_type }}');
+        
+        // Reload the page with new filters
+        window.location.href = currentUrl.toString();
     });
 });
 </script>

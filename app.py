@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session, flash
+from flask_mail import Mail, Message
 import mysql.connector
 from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime
@@ -17,8 +18,10 @@ db_config = {
 
 # Function to connect to the database
 def get_db_connection():
-    return mysql.connector.connect(**db_config)
-    
+    conn = mysql.connector.connect(**db_config)
+    # Add buffered=True to prevent unread results issues
+    cursor = conn.cursor(dictionary=True, buffered=True)
+    return conn
 
 # Home page
 @app.route('/')
@@ -39,6 +42,41 @@ def about():
 @app.route('/contact')
 def contact():
     return render_template('contact.html')
+@app.route('/send-message', methods=['POST'])
+def send_message():
+    try:
+        # Get form data
+        name = request.form.get('name')
+        email = request.form.get('email')
+        subject = request.form.get('subject')
+        message = request.form.get('message')
+
+        # Basic validation
+        if not all([name, email, subject, message]):
+            return jsonify({'success': False, 'error': 'All fields are required'}), 400
+
+        # Store in database
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute('''
+            INSERT INTO contact_messages (name, email, subject, message)
+            VALUES (%s, %s, %s, %s)
+        ''', (name, email, subject, message))
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        # Return success response
+        return jsonify({
+            'success': True,
+            'message': 'Thank you! Your message has been sent successfully.'
+        })
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
 # Team Page
 @app.route('/team')
 def team():
@@ -56,7 +94,11 @@ def book():
         cursor.close()
         conn.close()
 
-        return render_template('book.html', services=services)
+        # Get today's date for the minimum date in the form
+        min_date = datetime.now().strftime('%Y-%m-%d')
+        
+        return render_template('book.html', services=services, min_date=min_date)
+    
     elif request.method == 'POST':
         # Handle form submission
         full_name = request.form['full_name']
@@ -67,20 +109,96 @@ def book():
         service_id = request.form['service_id']
         receive_notifications = 'receive_notifications' in request.form
 
+        # Validate date
+        appointment_date_obj = datetime.strptime(appointment_date, '%Y-%m-%d').date()
+        if appointment_date_obj < datetime.now().date():
+            flash('Please select a date that is not in the past', 'error')
+            return redirect(url_for('book'))
+
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute('''
-            INSERT INTO appointments (full_name, phone_number, email, home_address, appointment_date, service_id, receive_notifications)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
-        ''', (full_name, phone_number, email, home_address, appointment_date, service_id, receive_notifications))
-        conn.commit()
-        cursor.close()
-        conn.close()
+        
+        try:
+            # Insert appointment
+            cursor.execute('''
+                INSERT INTO appointments (full_name, phone_number, email, home_address, appointment_date, service_id, receive_notifications)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+            ''', (full_name, phone_number, email, home_address, appointment_date, service_id, receive_notifications))
+            
+            # Get the inserted appointment ID
+            appointment_id = cursor.lastrowid
+            
+            # Get service name for email
+            cursor.execute('SELECT name FROM services WHERE id = %s', (service_id,))
+            service = cursor.fetchone()
+            service_name = service[0] if service else "Selected Service"
+            
+            conn.commit()
+            
+            # Prepare appointment details for email
+            appointment_details = {
+                'id': appointment_id,
+                'full_name': full_name,
+                'appointment_date': appointment_date,
+                'service_name': service_name
+            }
+            
+            # Send confirmation email
+            if email and receive_notifications:
+                if not send_confirmation_email(email, appointment_details):
+                    flash('Appointment booked successfully, but we couldn\'t send a confirmation email', 'warning')
+                else:
+                    flash('Appointment booked successfully! A confirmation email has been sent.', 'success')
+            else:
+                flash('Appointment booked successfully!', 'success')
+                
+            return redirect(url_for('book'))
+            
+        except Exception as e:
+            conn.rollback()
+            flash(f'Error booking appointment: {str(e)}', 'error')
+            return redirect(url_for('book'))
+            
+        finally:
+            cursor.close()
+            conn.close()
+# Configure Flask-Mail
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'  # Use your email provider's SMTP server
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'robeemuchiri@gmail.com'  # Your email
+app.config['MAIL_PASSWORD'] = 'clxelbzenhovoify'  # Your email password or app-specific password
+app.config['MAIL_DEFAULT_SENDER'] = 'noreply@medicareclinic.com'
 
-        flash('Appointment booked successfully!', 'success')
-        return redirect(url_for('book'))
-    return render_template('book.html', services=[])
+mail = Mail(app)
 
+def send_confirmation_email(recipient, appointment_details):
+    try:
+        msg = Message('Appointment Confirmation - Medicare Clinic',
+                      recipients=[recipient])
+        
+        msg.body = f"""
+Dear {appointment_details['full_name']},
+
+Thank you for booking an appointment with Medicare Clinic.
+
+Appointment Details:
+- Date: {appointment_details['appointment_date']}
+- Service: {appointment_details['service_name']}
+- Reference ID: {appointment_details['id']}
+
+Please arrive 15 minutes before your scheduled time. If you need to reschedule or cancel, please contact us at appointments@medicareclinic.com or call 254 743371171.
+
+We look forward to seeing you!
+
+Best regards,
+Medicare Clinic Team
+"""
+        mail.send(msg)
+        return True
+    except Exception as e:
+        print(f"Error sending email: {str(e)}")
+        return False
 # Admin login
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -108,19 +226,59 @@ def admin_appointments():
     if 'username' not in session:
         return redirect(url_for('login'))
 
+    sort_type = request.args.get('sort', 'nearest')
+    service_filter = request.args.get('service', 'all')
+
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute('''
-        SELECT appointments.*, services.name AS service_name
-        FROM appointments
-        LEFT JOIN services ON appointments.service_id = services.id
-    ''')
-    appointments = cursor.fetchall()
-    cursor.close()
-    conn.close()
+    cursor = conn.cursor(dictionary=True, buffered=True)  # Add buffered here too
 
-    return render_template('admin/appointments.html', appointments=appointments)
+    try:
+        # Get all services first
+        cursor.execute('SELECT id, name FROM services')
+        services = cursor.fetchall()  # Important: fetch all results immediately
 
+        # Build main query
+        base_query = '''
+            SELECT a.*, s.name AS service_name
+            FROM appointments a
+            LEFT JOIN services s ON a.service_id = s.id
+        '''
+        
+        params = []
+        where_clause = ''
+        if service_filter != 'all':
+            where_clause = ' WHERE a.service_id = %s'
+            params.append(service_filter)
+        
+        if sort_type == 'nearest':
+            order_by = '''
+                ORDER BY 
+                    CASE 
+                        WHEN a.appointment_date >= CURDATE() THEN 0
+                        ELSE 1
+                    END,
+                    ABS(DATEDIFF(a.appointment_date, CURDATE()))
+            '''
+        elif sort_type == 'newest':
+            order_by = ' ORDER BY a.appointment_date DESC'
+        elif sort_type == 'oldest':
+            order_by = ' ORDER BY a.appointment_date ASC'
+        else:
+            order_by = ' ORDER BY a.appointment_date'
+        
+        # Execute main query
+        cursor.execute(base_query + where_clause + order_by, params if params else None)
+        appointments = cursor.fetchall()  # Fetch all results immediately
+
+        return render_template('admin/appointments.html', 
+                            appointments=appointments,
+                            services=services,
+                            sort_type=sort_type,
+                            current_service=service_filter)
+    
+    finally:
+        cursor.close()
+        conn.close()
 @app.route('/admin/appointments/<int:appointment_id>', methods=['DELETE'])
 def delete_appointment(appointment_id):
     if 'username' not in session:
@@ -381,6 +539,43 @@ def logout():
     session.pop('username', None)
     return redirect(url_for('index')) 
 
+# Display Messages
+@app.route('/admin/contact_messages')
+def admin_contact_messages():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+
+    # Get sorting parameters from request
+    name_sort = request.args.get('name_sort', 'asc')  # 'asc' or 'desc'
+    date_sort = request.args.get('date_sort', 'desc')  # 'asc' or 'desc'
+
+    # Build SQL query with sorting
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    # Base query
+    query = 'SELECT * FROM contact_messages'
+    
+    # Add sorting
+    order_by = []
+    if name_sort:
+        order_by.append(f'name {name_sort}')
+    if date_sort:
+        order_by.append(f'created_at {date_sort}')
+    
+    if order_by:
+        query += ' ORDER BY ' + ', '.join(order_by)
+    
+    cursor.execute(query)
+    messages = cursor.fetchall()
+    cursor.close()
+    conn.close()
+
+    return render_template('admin/contact_messages.html', 
+                         messages=messages,
+                         name_sort=name_sort,
+                         date_sort=date_sort)
+
 # search drugs
 @app.route('/search_drugs')
 def search_drugs():
@@ -432,27 +627,41 @@ def update_stock():
     # Get form data
     drug_id = request.form['drug_id']
     quantity_to_add = int(request.form['quantity_to_add'])
+    new_price = request.form.get('new_price')  # Optional field
 
     # Fetch the current stock from the database
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    cursor.execute('SELECT quantity FROM drugs WHERE id = %s', (drug_id,))
-    drug = cursor.fetchone()
+    
+    try:
+        # Update stock quantity
+        cursor.execute('SELECT quantity FROM drugs WHERE id = %s', (drug_id,))
+        drug = cursor.fetchone()
 
-    if not drug:
-        flash('Drug not found!', 'error')
-        return redirect(url_for('admin_stock'))
+        if not drug:
+            flash('Drug not found!', 'error')
+            return redirect(url_for('admin_stock'))
 
-    # Calculate the new stock quantity
-    new_quantity = drug['quantity'] + quantity_to_add
+        new_quantity = drug['quantity'] + quantity_to_add
+        cursor.execute('UPDATE drugs SET quantity = %s WHERE id = %s', 
+                      (new_quantity, drug_id))
 
-    # Update the drug quantity in the database
-    cursor.execute('UPDATE drugs SET quantity = %s WHERE id = %s', (new_quantity, drug_id))
-    conn.commit()
-    cursor.close()
-    conn.close()
+        # Update price if provided
+        if new_price:
+            cursor.execute('UPDATE drugs SET price = %s WHERE id = %s', 
+                          (float(new_price), drug_id))
 
-    flash(f'Stock updated successfully! Added {quantity_to_add} units. New stock: {new_quantity}', 'success')
+        conn.commit()
+        flash(f'Stock updated successfully! Added {quantity_to_add} units. New stock: {new_quantity}', 'success')
+        
+    except Exception as e:
+        conn.rollback()
+        flash(f'Error updating stock: {str(e)}', 'error')
+        
+    finally:
+        cursor.close()
+        conn.close()
+
     return redirect(url_for('admin_stock'))
 
 # Function to delete expired appointments
@@ -465,6 +674,8 @@ def delete_expired_appointments():
     cursor.close()
     conn.close()
     print("Expired appointments deleted.")
+
+
 
 # Initialize the scheduler
 scheduler = BackgroundScheduler()

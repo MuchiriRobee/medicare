@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Us - HealthPoint Medical Clinic</title>
+    <title>Medicare Clinic</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* Reuse the same styles from the About Us page */
@@ -603,34 +603,35 @@
                         <i class="fas fa-phone"></i>
                         <div>
                             <h3>Call Us</h3>
-                            <p>254 743371171</p>
+                            <a href="tel:254743371171">254 743371171</a>
                         </div>
                     </li>
                     <li>
                         <i class="fas fa-envelope"></i>
                         <div>
                             <h3>Email Us</h3>
-                            <p>info@medicare.com</p>
+                            <a href="mailto:info@medicare.com">info@medicare.com</a>
                         </div>
                     </li>
                 </div>
             </div>
             <div class="contact-form fade-in">
                 <h3>Send Us a Message</h3>
-                <form>
-                    <input type="text" placeholder="Your Name" required>
-                    <input type="email" placeholder="Your Email" required>
-                    <input type="text" placeholder="Subject" required>
-                    <textarea placeholder="Your Message" required></textarea>
+                <form id="contactForm">
+                    <input type="text" name="name" placeholder="Your Name" required>
+                    <input type="email" name="email" placeholder="Your Email" required>
+                    <input type="text" name="subject" placeholder="Subject" required>
+                    <textarea name="message" placeholder="Your Message" required></textarea>
                     <button type="submit">Send Message</button>
                 </form>
+                <div id="formResponse" style="margin-top: 15px; display: none;"></div>
             </div>
         </div>
     </section>
 
     <!-- Map Section -->
     <section class="map fade-in">
-        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3022.183792036752!2d-73.9961596845941!3d40.748440479327!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c259a9b3117469%3A0xd134e199a405a163!2sEmpire%20State%20Building!5e0!3m2!1sen!2sus!4v1629999999999!5m2!1sen!2sus" allowfullscreen="" loading="lazy"></iframe>
+        <iframe src="https://www.openstreetmap.org/export/embed.html?bbox=36.057%2C-0.293%2C36.077%2C-0.273&layer=mapnik" allowfullscreen="" loading="lazy"></iframe>
     </section>
 
     <!-- Footer -->
@@ -668,11 +669,14 @@
                         </li>
                         <li>
                             <i class="fas fa-phone-alt"></i>
-                            <span class="contact-text">254 743371171<br>254 745211657</span>
+                            <span class="contact-text">  <a href="tel:+254743371171">254 743371171</a><br>
+                                <a href="tel:+254745211657">254 745211657</a></span>
                         </li>
                         <li>
                             <i class="fas fa-envelope"></i>
-                            <span class="contact-text">info@medicareclinic.com<br>appointments@medicareclinic.com</span>
+                            <span class="contact-text">
+                                <a href="mailto:info@medicareclinic.com">info@medicareclinic.com</a><br>
+                                <a href="mailto:appointments@medicareclinic.com">appointments@medicareclinic.com</a>                            </span>
                         </li>
                     </ul>
                 </div>
@@ -716,6 +720,51 @@
                 header.classList.remove('scrolled');
             }
         });
+        document.addEventListener('DOMContentLoaded', function() {
+        const contactForm = document.getElementById('contactForm');
+        const responseDiv = document.getElementById('formResponse');
+
+        contactForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Show loading state
+            responseDiv.style.display = 'block';
+            responseDiv.innerHTML = '<p style="color: var(--primary);">Sending your message...</p>';
+            
+            try {
+                const formData = new FormData(contactForm);
+                
+                const response = await fetch('/send-message', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to send message');
+                }
+                
+                if (data.success) {
+                    // Success message
+                    responseDiv.innerHTML = `<p style="color: var(--secondary);">${data.message}</p>`;
+                    contactForm.reset();
+                } else {
+                    // Server returned success:false
+                    responseDiv.innerHTML = `<p style="color: var(--accent);">Error: ${data.error || 'Failed to send message'}</p>`;
+                }
+            } catch (error) {
+                // Network error or other issues
+                responseDiv.innerHTML = `<p style="color: var(--accent);">Error: ${error.message || 'Failed to send message'}</p>`;
+                console.error('Error:', error);
+            } finally {
+                // Hide the message after 5 seconds
+                setTimeout(() => {
+                    responseDiv.style.display = 'none';
+                }, 5000);
+            }
+        });
+    });
     </script>
 </body>
 </html>

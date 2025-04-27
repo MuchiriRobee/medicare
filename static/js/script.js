@@ -36,7 +36,36 @@ document.querySelector('form').addEventListener('submit', (event) => {
         alert('Please fill out all required fields.');
     }
 });
+document.addEventListener('DOMContentLoaded', function() {
+    // Set minimum date to today
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('appointment_date').min = today;
+    
+    // Header scroll effect
+    window.addEventListener('scroll', function() {
+        const header = document.getElementById('header');
+        if (window.scrollY > 100) {
+            header.classList.add('scrolled');
+        } else {
+            header.classList.remove('scrolled');
+        }
+    });
 
+    // Form validation
+    const bookingForm = document.getElementById('bookingForm');
+    bookingForm.addEventListener('submit', function(e) {
+        const appointmentDate = new Date(document.getElementById('appointment_date').value);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        if (appointmentDate < today) {
+            e.preventDefault();
+            alert('Please select a date that is not in the past');
+            return false;
+        }
+        return true;
+    });
+});
 // Toggle Mobile Navigation Menu
 const navToggle = document.createElement('button');
 navToggle.innerHTML = '&#9776;';
@@ -270,6 +299,43 @@ document.addEventListener('DOMContentLoaded', function () {
     window.addEventListener('click', function (event) {
         if (!event.target.matches('.dropdown-toggle')) {
             dropdownMenu.style.display = 'none';
+        }
+    });
+});
+document.addEventListener('DOMContentLoaded', function() {
+    // Show/hide stock table popup
+    const showStockBtn = document.getElementById('showStockBtn');
+    const stockTablePopup = document.getElementById('stockTablePopup');
+    const closeBtn = document.querySelector('.close-btn');
+    
+    showStockBtn.addEventListener('click', function() {
+        stockTablePopup.style.display = 'flex';
+        document.body.style.overflow = 'hidden'; // Prevent scrolling when popup is open
+    });
+    
+    closeBtn.addEventListener('click', function() {
+        stockTablePopup.style.display = 'none';
+        document.body.style.overflow = ''; // Re-enable scrolling
+    });
+    
+    // Close popup when clicking outside
+    stockTablePopup.addEventListener('click', function(e) {
+        if (e.target === stockTablePopup) {
+            stockTablePopup.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+    });
+    
+    // Auto-fill current price when drug is selected
+    const drugSelect = document.getElementById('drug_id');
+    const priceInput = document.getElementById('new_price');
+    
+    drugSelect.addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        if (selectedOption.value) {
+            priceInput.value = selectedOption.dataset.price || '';
+        } else {
+            priceInput.value = '';
         }
     });
 });

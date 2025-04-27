@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://fontawesome.com/v4/icons/">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <title>Admin Dashboard</title>
+    <title>Admin-Medicare</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 <body>
@@ -23,8 +23,7 @@
                     <li><a href="{{ url_for('admin_reports') }}">Reports</a></li>
                     <li><a href="{{ url_for('admin_pos') }}">Point of Sale</a></li>
                     <li><a href="{{ url_for('admin_stock') }}">Stock Management</a></li>
-
-
+                    <li><a href="{{ url_for('admin_contact_messages') }}">Contact Messages</a></li>
                 </ul>
             </nav>
             <a href="{{ url_for('logout') }}" class="logout">Logout</a>
