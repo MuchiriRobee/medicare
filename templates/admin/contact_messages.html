@@ -17,17 +17,7 @@
             </a>
         </div>
         
-        <div class="filter-group">
-            <span>Sort by Date:</span>
-            <a href="{{ url_for('admin_contact_messages', name_sort=name_sort, date_sort='desc') }}" 
-               class="filter-btn {% if date_sort == 'desc' %}active{% endif %}">
-                Newest First
-            </a>
-            <a href="{{ url_for('admin_contact_messages', name_sort=name_sort, date_sort='asc') }}" 
-               class="filter-btn {% if date_sort == 'asc' %}active{% endif %}">
-                Oldest First
-            </a>
-        </div>
+        
     </div>
 
     <div class="table-responsive">
