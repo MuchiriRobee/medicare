@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medicare Clinic</title>
+    <link rel="icon" href="static/images/stethoscope.png">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --accent-color: #e74c3c;
+            --light-gray: #f5f7fa;
+            --dark-gray: #333;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light-gray);
+            color: var(--dark-gray);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .back-to-dashboard {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        h1 {
+            margin-bottom: 20px;
+            color: var(--secondary-color);
+        }
+        
+        .search-container {
+            margin-bottom: 30px;
+        }
+        
+        #faq-search {
+            width: 100%;
+            padding: 12px 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        .category-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .category-tab {
+            padding: 8px 16px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .category-tab.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        .category-tab:hover:not(.active) {
+            background-color: #f0f0f0;
+        }
+        
+        .faq-category {
+            margin-bottom: 40px;
+            display: none;
+        }
+        
+        .faq-category.active {
+            display: block;
+        }
+        
+        .faq-item {
+            background-color: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+        
+        .faq-question {
+            padding: 15px 20px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .faq-question:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .faq-answer {
+            padding: 0 20px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+        }
+        
+        .faq-item.active .faq-answer {
+            padding: 0 20px 20px;
+            max-height: 500px;
+        }
+        
+        .expand-icon {
+            transition: transform 0.3s ease;
+        }
+        
+        .faq-item.active .expand-icon {
+            transform: rotate(180deg);
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 30px;
+            color: #666;
+            display: none;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            color: #666;
+            border-top: 1px solid #ddd;
+        }
+        
+        .contact-support {
+            margin-top: 30px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <div class="logo">Dashboard FAQs</div>
+            <a href="{{ url_for('index') }}" class="back-to-dashboard">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                Back to Dashboard
+            </a>
+        </div>
+    </header>
+    
+    <main class="container">
+        <h1>Frequently Asked Questions</h1>
+        
+        <div class="search-container">
+            <input type="text" id="faq-search" placeholder="Search FAQs...">
+        </div>
+        
+        <div class="category-tabs">
+            <div class="category-tab active" data-category="all">All Questions</div>
+            <div class="category-tab" data-category="account">Services</div>
+            <div class="category-tab" data-category="features">Safety</div>
+            <div class="category-tab" data-category="billing">Appointment</div>
+            <div class="category-tab" data-category="troubleshooting">Troubleshooting</div>
+        </div>
+        
+        <div class="no-results">
+            <h3>No results found</h3>
+            <p>Try different search terms or categories</p>
+        </div>
+        
+        <div id="faq-container">
+            <div class="faq-category active" data-category="all">
+                <!-- All questions will be shown here by default -->
+            </div>
+            
+            <div class="faq-category" data-category="account">
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>What services are offered by Medicare clinic?</span>
+                        <svg class="expand-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M6 9l6 6 6-6"/>
+                        </svg>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Services offered by Medicare clinic are:</p>
+                        <ol>
+                            <li>Primary care</li>
+                            <li>Speciallised care</li>
+                            <li>Preventive care and health screenings</li>
+                            <li>Surgical procedures</li>
+                        </ol>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>What are the operating hours?</span>
+                        <svg class="expand-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M6 9l6 6 6-6"/>
+                        </svg>
+                    </div>
+                    <div class="faq-answer">
+                        <p>The operating hours are:</p>
+                        <ol>
+                            <li>Monday to Friday 8:00 AM-7:00PM</li>
+                            <li>Saturday 9:00AM- 5:00PM</li>
+                            <li>Sunday 10:00AM-2:00PM</li>
+                            <li>Holidays- Emergency only</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="faq-category" data-category="features">
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Do you offer COVID-19 testing/vaccination?</span>
+                        <svg class="expand-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M6 9l6 6 6-6"/>
+                        </svg>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Yes, we provide:</p>
+                        <ol>
+                            <li>PCR and rapid antigen testing</li>
+                            <li>COVID-19 vaccination (all approved types)</li>
+                            <li>Travel clearance certificates</li>                            
+                        </ol>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>Can my records be shared with another doctor?</span>
+                        <svg class="expand-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M6 9l6 6 6-6"/>
+                        </svg>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Yes, with your written authorization:</p>
+                        <ol>
+                            <li>Complete a Release of Information form</li>
+                            <li>Specify what records to share and with whom</li>                            
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="faq-category" data-category="billing">
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>What should I bring to my appointment?</span>
+                        <svg class="expand-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M6 9l6 6 6-6"/>
+                        </svg>
+                    </div>
+                    <div class="faq-answer">
+                        <p>Please bring:</p>
+                        <ol>
+                            <li>National ID</li>
+                            <li>Insurance card</li>
+                            <li>List of current medication</li>
+                        </ol>
+                        <p>You can also bring any relevant information/medical records</p>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>How do I book an appointment?</span>
+                        <svg class="expand-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M6 9l6 6 6-6"/>
+                        </svg>
+                    </div>
+                    <div class="faq-answer">
+                        <p>You can book appointments through:</p>
+                        <ol>
+                            <li>Go to "Book Appointment tab"</li>
+                            <li>Fill your details completely and correctly</li>
+                            <li>Click on "Receive notifcation checkbox to confirm booking"</li>
+                            <li>Click "Submit button"</li>                            
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="faq-category" data-category="troubleshooting">
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <span>What should I do if the dashboard is loading slowly?</span>
+                        <svg class="expand-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M6 9l6 6 6-6"/>
+                        </svg>
+                    </div>
+                    <div class="faq-answer">
+                        <p>If the dashboard is loading slowly, try these steps:</p>
+                        <ol>
+                            <li>Refresh your browser</li>
+                            <li>Clear your browser cache and cookies</li>
+                            <li>Try using a different browser (Chrome, Firefox, or Edge recommended)</li>
+                            <li>Check your internet connection</li>
+                            <li>Close other tabs and applications that might be using bandwidth</li>
+                        </ol>
+                        <p>If the issue persists, please contact our support team with details about your browser and any error messages you see.</p>
+                    </div>
+                </div>
+                
+               
+            </div>
+        </div>
+        
+        <div class="contact-support">
+            <h2>Still need help?</h2>
+            <p>If you can't find the answer to your question, our support team is ready to help.</p>
+            <p>Contact us at <a href="mailto:info@medicareclinic.com">info@medicareclinic.com</a> or call  <a href="tel:254743371171">254743371171</a></p>
+            <p>Average response time: 2 business hours.</p>
+        </div>
+    </main>
+    
+    <footer>
+        <p>&copy; 2025 Medicare Medical Clinic. All Rights Reserved.</p>
+    </footer>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize all FAQ items from categories into the "all" category
+            const allCategoryContainer = document.querySelector('.faq-category[data-category="all"]');
+            const allFaqItems = document.querySelectorAll('.faq-item');
+            
+            allFaqItems.forEach(item => {
+                const clone = item.cloneNode(true);
+                allCategoryContainer.appendChild(clone);
+            });
+            
+            // Category tab functionality
+            const categoryTabs = document.querySelectorAll('.category-tab');
+            categoryTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Update active tab
+                    categoryTabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Show selected category
+                    const category = this.getAttribute('data-category');
+                    document.querySelectorAll('.faq-category').forEach(cat => {
+                        cat.classList.remove('active');
+                    });
+                    document.querySelector(`.faq-category[data-category="${category}"]`).classList.add('active');
+                    
+                    // Reset search
+                    document.getElementById('faq-search').value = '';
+                    document.querySelector('.no-results').style.display = 'none';
+                    document.querySelectorAll('.faq-item').forEach(item => {
+                        item.style.display = '';
+                    });
+                });
+            });
+            
+            // FAQ item toggle functionality
+            document.querySelectorAll('.faq-question').forEach(question => {
+                question.addEventListener('click', function() {
+                    const faqItem = this.parentElement;
+                    faqItem.classList.toggle('active');
+                });
+            });
+            
+            // Search functionality
+            document.getElementById('faq-search').addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const activeCategory = document.querySelector('.faq-category.active');
+                const faqItems = activeCategory.querySelectorAll('.faq-item');
+                let hasResults = false;
+                
+                faqItems.forEach(item => {
+                    const question = item.querySelector('.faq-question span').textContent.toLowerCase();
+                    const answer = item.querySelector('.faq-answer').textContent.toLowerCase();
+                    
+                    if (question.includes(searchTerm) || answer.includes(searchTerm)) {
+                        item.style.display = '';
+                        hasResults = true;
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+                
+                document.querySelector('.no-results').style.display = hasResults ? 'none' : 'block';
+            });
+        });
+    </script>
+</body>
+</html>

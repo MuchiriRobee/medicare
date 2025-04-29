@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Medicare Clinic</title>
+    <title>Patient Medicare Clinic</title>
     <link rel="icon" href="static/images/stethoscope.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* Use the same styles as book.html */
         * {
             margin: 0;
             padding: 0;
@@ -88,8 +89,8 @@
             color: var(--primary);
         }
 
-        .book-btn {
-            background-color: var(--primary);
+        .logout-btn {
+            background-color: var(--accent);
             color: white;
             border: none;
             padding: 10px 20px;
@@ -100,153 +101,120 @@
             text-decoration: none;
         }
 
-        .book-btn:hover {
-            background-color: #3b78e7;
+        .logout-btn:hover {
+            background-color: #d33445;
             transform: translateY(-2px);
         }
 
-        .login-btn {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 50px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
+        /* Dashboard Styles */
+        .dashboard-container {
+            padding: 150px 0 80px;
         }
 
-        .login-btn:hover {
-            background-color: #3b78e7;
-            transform: translateY(-2px);
+        .welcome-section {
+            text-align: center;
+            margin-bottom: 40px;
         }
 
-        /* Hero Section for Booking Page */
-        .booking-hero {
-            height: 300px;
-            background: linear-gradient(rgba(66, 133, 244, 0.8), rgba(52, 168, 83, 0.8)), url('static/images/backimage.jpg') center/cover no-repeat;
-            color: white;
-            display: flex;
-            align-items: center;
-            padding-top: 80px;
+        .welcome-section h1 {
+            font-size: 36px;
+            color: var(--primary);
+            margin-bottom: 10px;
         }
 
-        .booking-hero-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-            width: 100%;
+        .welcome-section p {
+            font-size: 18px;
+            color: var(--dark);
         }
 
-        .booking-hero h1 {
-            font-size: 42px;
-            margin-bottom: 15px;
-        }
-
-        /* Booking Form Section */
-        .booking-section {
-            padding: 80px 0;
+        .appointments-section {
             background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
         }
 
         .section-title {
-            text-align: center;
-            margin-bottom: 50px;
-            position: relative;
-        }
-
-        .section-title h2 {
-            font-size: 36px;
+            font-size: 24px;
+            margin-bottom: 20px;
             color: var(--dark);
-            display: inline-block;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary);
         }
 
-        .section-title h2::after {
-            content: '';
-            display: block;
-            width: 70px;
-            height: 4px;
-            background-color: var(--primary);
-            margin: 15px auto 0;
-            border-radius: 2px;
-        }
-
-        .book_container {
-            max-width: 800px;
-            margin: 0 auto;
-            background-color: white;
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        }
-
-        .bookappointment {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 25px;
-        }
-
-        .bookappointment label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--dark);
-        }
-
-        .bookappointment input,
-        .bookappointment select,
-        .bookappointment textarea {
+        .appointments-table {
             width: 100%;
+            border-collapse: collapse;
+        }
+
+        .appointments-table th, 
+        .appointments-table td {
             padding: 12px 15px;
-            border: 1px solid #ddd;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .appointments-table th {
+            background-color: #f5f5f5;
+            font-weight: 600;
+        }
+
+        .appointments-table tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .status-pending {
+            color: #ff9800;
+            font-weight: 600;
+        }
+
+        .status-confirmed {
+            color: var(--secondary);
+            font-weight: 600;
+        }
+
+        .status-cancelled {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .cancel-btn {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 8px 15px;
             border-radius: 5px;
-            font-size: 16px;
+            cursor: pointer;
             transition: all 0.3s ease;
         }
 
-        .bookappointment input:focus,
-        .bookappointment select:focus,
-        .bookappointment textarea:focus {
-            border-color: var(--primary);
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.2);
+        .cancel-btn:hover {
+            background-color: #d33445;
         }
 
-        .bookappointment textarea {
-            min-height: 100px;
-            resize: vertical;
+        .no-appointments {
+            text-align: center;
+            padding: 30px;
+            color: #666;
         }
 
-        .full-width {
-            grid-column: 1 / -1;
-        }
-
-        .checkbox-label {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-        }
-
-        .checkbox-label input {
-            width: auto;
-        }
-
-        .submit-btn {
-            grid-column: 1 / -1;
+        .book-more-btn {
+            display: inline-block;
             background-color: var(--primary);
             color: white;
             border: none;
-            padding: 15px;
+            padding: 12px 25px;
             border-radius: 5px;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
+            text-decoration: none;
+            margin-top: 20px;
         }
 
-        .submit-btn:hover {
+        .book-more-btn:hover {
             background-color: #3b78e7;
             transform: translateY(-2px);
         }
@@ -267,13 +235,12 @@
 
         .modal-content {
             background-color: white;
-            padding: 40px;
+            padding: 30px;
             border-radius: 10px;
             max-width: 500px;
             width: 90%;
             text-align: center;
-            position: relative;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
         }
 
         .modal h2 {
@@ -282,26 +249,44 @@
         }
 
         .modal p {
-            margin-bottom: 30px;
-            font-size: 18px;
+            margin-bottom: 25px;
+            font-size: 16px;
         }
 
-        .close {
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            font-size: 28px;
-            font-weight: bold;
-            color: #aaa;
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
             cursor: pointer;
-            transition: color 0.3s ease;
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
 
-        .close:hover {
-            color: var(--dark);
+        .modal-btn-confirm {
+            background-color: var(--accent);
+            color: white;
         }
 
-        /* Footer */
+        .modal-btn-confirm:hover {
+            background-color: #d33445;
+        }
+
+        .modal-btn-cancel {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .modal-btn-cancel:hover {
+            background-color: #5a6268;
+        }
+
+        /* Footer Styles - Same as book.html */
         footer {
             background-color: var(--dark);
             color: white;
@@ -391,165 +376,118 @@
             color: #aaa;
             font-size: 14px;
         }
-        /* Flash Messages */
-.alert {
-    padding: 40px;
-    margin-bottom: 20px;
-    border: 1px solid transparent;
-    border-radius: 4px;
-}
 
-.alert-success {
-    color: #155724;
-    background-color: #d4edda;
-    border-color: #c3e6cb;
-}
-
-.alert-error {
-    color: #721c24;
-    background-color: #f8d7da;
-    border-color: #f5c6cb;
-}
         /* Responsive Styles */
         @media (max-width: 768px) {
-            .bookappointment {
-                grid-template-columns: 1fr;
+            .dashboard-container {
+                padding: 120px 0 60px;
             }
 
-            .booking-hero h1 {
-                font-size: 32px;
-            }
-
-            .section-title h2 {
-                font-size: 30px;
-            }
-
-            .book_container {
-                padding: 30px 20px;
+            .appointments-table {
+                display: block;
+                overflow-x: auto;
             }
         }
 
         @media (max-width: 480px) {
-            .header-container {
-                flex-direction: column;
-                text-align: center;
-                padding: 15px;
+            .dashboard-container {
+                padding: 100px 0 40px;
             }
 
-            nav ul {
-                margin-top: 15px;
-                flex-wrap: wrap;
-                justify-content: center;
-                gap: 15px;
-            }
-
-            .booking-hero {
-                height: 250px;
-                padding-top: 120px;
-            }
-
-            .booking-hero h1 {
+            .welcome-section h1 {
                 font-size: 28px;
             }
         }
     </style>
 </head>
 <body>
-    
     <!-- Header -->
     <header id="header">
         <div class="container header-container">
-            <a href="#" class="logo">
+            <a href="{{ url_for('index') }}" class="logo">
                 <i class="fas fa-heartbeat"></i>
                 <span>Medicare Clinic</span>
             </a>
             <nav>
                 <ul>
                     <li><a href="{{ url_for('index') }}">Home</a></li>
-                    <li><a href="{{ url_for('about') }}">About Us</a></li>
                     <li><a href="{{ url_for('services') }}">Services</a></li>
-                    <li><a href="{{ url_for('contact') }}">Contact</a></li>
+                    <li><a href="{{ url_for('book') }}">Book Appointment</a></li>
+                   <!--<li><a href="{{ url_for('change_password') }}">Change Password</a></li>--> 
                 </ul>
             </nav>
-            <a href="{{ url_for('book') }}" class="book-btn">Book Appointment</a>
-            <a href="{{ url_for('login') }}" class="login-btn">Admin Login</a>
-            <a href="{{ url_for('patient_login') }}" class="login-btn">Patient Portal</a>
-
+            <a href="{{ url_for('patient_logout') }}" class="logout-btn">Logout</a>
         </div>
     </header>
 
-    <!-- Hero Section -->
-    <section class="booking-hero">
-        <div class="booking-hero-content">
-            <h1>Book an Appointment</h1>
-            <p>Schedule your visit with our healthcare professionals</p>
+    <!-- Dashboard Content -->
+    <div class="container dashboard-container">
+        <div class="welcome-section">
+            <h1>Welcome, {{ patient.full_name }}!</h1>
+            <p>Here you can manage your appointments with Medicare Clinic</p>
         </div>
-    </section>
 
-    <!-- Booking Form Section -->
-    <section class="booking-section">
-        <div class="section-title">
-            <h2>Schedule Your Visit</h2>
-        </div>
-        <div class="book_container">
-            <form method="POST" class="bookappointment" id="bookingForm">
-                <div class="form-group full-width">
-                    <label for="full_name">Full Name:</label>
-                    <input type="text" id="full_name" name="full_name" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="phone_number">Phone Number:</label>
-                    <input type="tel" id="phone_number" name="phone_number" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="email">Email:</label>
-                    <input type="email" id="email" name="email" required>
-                </div>
-
-                <div class="form-group full-width">
-                    <label for="home_address">Home Address:</label>
-                    <textarea id="home_address" name="home_address" required></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label for="appointment_date">Appointment Date:</label>
-                    <input type="date" id="appointment_date" name="appointment_date" required min="{{ min_date }}">
-                </div>
-                
-                <div class="form-group">
-                    <label for="service_id">Select Service:</label>
-                    <select id="service_id" name="service_id" required>
-                        <option value="">-- Select a Service --</option>
-                        {% for service in services %}
-                        <option value="{{ service.id }}">{{ service.name }}</option>
+        <div class="appointments-section">
+            <h2 class="section-title">Your Appointments</h2>
+            
+            {% if appointments %}
+                <table class="appointments-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Service</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for appointment in appointments %}
+                        <tr>
+                            <td>{{ appointment.appointment_date }}</td>
+                            <td>{{ appointment.service_name }}</td>
+                            <td class="status-pending">Pending</td>
+                            <td>
+                                <button class="cancel-btn" data-id="{{ appointment.id }}">
+                                    Cancel
+                                </button>
+                            </td>
+                        </tr>
                         {% endfor %}
-                    </select>
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="no-appointments">
+                    <p>You don't have any appointments yet.</p>
+                    <a href="{{ url_for('book') }}" class="book-more-btn">
+                        Book an Appointment
+                    </a>
                 </div>
-                
-                <div class="form-group full-width">
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="receive_notifications" name="receive_notifications" checked>
-                        Receive email notifications
-                    </label>
-                </div>
-
-                <button type="submit" class="submit-btn">Book Appointment</button>
-            </form>
+            {% endif %}
         </div>
-    </section>
+    </div>
 
-     <!-- Flash Messages -->
-     {% with messages = get_flashed_messages(with_categories=true) %}
-     {% if messages %}
-         {% for category, message in messages %}
-             <div class="alert alert-{{ category }}">
-                 {{ message }}
-             </div>
-         {% endfor %}
-     {% endif %}
- {% endwith %}
+    <!-- Confirmation Modal -->
+    <div id="confirmationModal" class="modal">
+        <div class="modal-content">
+            <h2>Confirm Cancellation</h2>
+            <p>Are you sure you want to cancel this appointment?</p>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-confirm" id="confirmCancel">Yes, Cancel</button>
+                <button class="modal-btn modal-btn-cancel" id="cancelCancel">No, Keep It</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <h2>Appointment Cancelled</h2>
+            <p>Your appointment has been successfully cancelled.</p>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-confirm" id="closeSuccessModal">OK</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Footer -->
     <footer>
@@ -599,7 +537,7 @@
         </div>
     </footer>
 
-    <script src="{{ url_for('static', filename='js/scripts.js') }}">
+    <script>
         // Scroll effect for header
         window.addEventListener('scroll', function() {
             const header = document.getElementById('header');
@@ -610,7 +548,75 @@
             }
         });
 
-       
+        // Appointment cancellation functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const cancelButtons = document.querySelectorAll('.cancel-btn');
+            const confirmationModal = document.getElementById('confirmationModal');
+            const successModal = document.getElementById('successModal');
+            const confirmCancelBtn = document.getElementById('confirmCancel');
+            const cancelCancelBtn = document.getElementById('cancelCancel');
+            const closeSuccessModalBtn = document.getElementById('closeSuccessModal');
+            let appointmentIdToCancel = null;
+
+            // Open confirmation modal when cancel button is clicked
+            cancelButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    appointmentIdToCancel = this.getAttribute('data-id');
+                    confirmationModal.style.display = 'flex';
+                });
+            });
+
+            // Handle confirm cancel button click
+            confirmCancelBtn.addEventListener('click', function() {
+                if (appointmentIdToCancel) {
+                    fetch(`/patient/cancel_appointment/${appointmentIdToCancel}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            confirmationModal.style.display = 'none';
+                            successModal.style.display = 'flex';
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 2000);
+                        } else {
+                            alert('Failed to cancel appointment: ' + data.error);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred while cancelling the appointment.');
+                    });
+                }
+            });
+
+            // Handle cancel cancel button click
+            cancelCancelBtn.addEventListener('click', function() {
+                confirmationModal.style.display = 'none';
+                appointmentIdToCancel = null;
+            });
+
+            // Handle close success modal button click
+            closeSuccessModalBtn.addEventListener('click', function() {
+                successModal.style.display = 'none';
+                window.location.reload();
+            });
+
+            // Close modals when clicking outside
+            window.addEventListener('click', function(event) {
+                if (event.target === confirmationModal) {
+                    confirmationModal.style.display = 'none';
+                }
+                if (event.target === successModal) {
+                    successModal.style.display = 'none';
+                    window.location.reload();
+                }
+            });
+        });
     </script>
 </body>
 </html>

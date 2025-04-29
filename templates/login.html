@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MediCare Clinic </title>
+  <title>MediCare Clinic</title>
   <link rel="icon" href="static/images/stethoscope.png">
   <style>
     * {
@@ -21,12 +21,62 @@
       background: linear-gradient(45deg, #ff9a9e, #fad0c4, #fad0c4, #a18cd1);
       background-size: 400% 400%;
       animation: gradientBG 15s ease infinite;
+      flex-direction: column;
     }
     
     @keyframes gradientBG {
       0% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
+    }
+    
+    .flash-container {
+      position: absolute;
+      top: 20px;
+      width: 100%;
+      max-width: 550px;
+      padding: 0 20px;
+      z-index: 100;
+    }
+    
+    .alert {
+      padding: 15px;
+      margin-bottom: 15px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      animation: slideIn 0.5s ease-out;
+      position: relative;
+    }
+    
+    @keyframes slideIn {
+      from { transform: translateY(-50px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    
+    .alert-success {
+      color: #155724;
+      background-color: #d4edda;
+      border-color: #c3e6cb;
+    }
+    
+    .alert-error {
+      color: #721c24;
+      background-color: #f8d7da;
+      border-color: #f5c6cb;
+    }
+    
+    .close-btn {
+      position: absolute;
+      right: 10px;
+      top: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      background: none;
+      border: none;
+      font-size: 16px;
+      color: inherit;
     }
     
     .login-container {
@@ -40,6 +90,7 @@
       perspective: 1000px;
       transform: translateZ(0);
       transition: all 0.5s ease;
+      position: relative;
     }
     
     .login-container:hover {
@@ -103,6 +154,25 @@
       border-bottom: 2px solid #a18cd1;
     }
     
+    .input-error {
+      color: #e74c3c;
+      font-size: 12px;
+      margin-top: 5px;
+      display: none;
+    }
+    
+    .input-group.error input {
+      border-bottom: 2px solid #e74c3c;
+    }
+    
+    .input-group.error label {
+      color: #e74c3c;
+    }
+    
+    .input-group.error .input-error {
+      display: block;
+    }
+    
     .password-toggle {
       position: absolute;
       right: 0;
@@ -142,94 +212,147 @@
       box-shadow: 0 5px 15px rgba(161, 140, 209, 0.4);
     }
     
+    button:disabled {
+      background: #cccccc;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    
     /* SVG icons */
     .icon {
       width: 20px;
       height: 20px;
       fill: currentColor;
     }
-    /* Flash Messages */
-.alert {
-    padding: 40px;
-    margin-bottom: 20px;
-    border: 1px solid transparent;
-    border-radius: 4px;
-}
-
-.alert-success {
-    color: #155724;
-    background-color: #d4edda;
-    border-color: #c3e6cb;
-}
-
-.alert-error {
-    color: #721c24;
-    background-color: #f8d7da;
-    border-color: #f5c6cb;
-  }
+    
+    .secondary-btn {
+      display: block;
+      text-align: center;
+      margin-top: 20px;
+      color: #a18cd1;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+    
+    .secondary-btn:hover {
+      color: #fbc2eb;
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
-      <!-- Flash Messages -->
-  {% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-      {% for category, message in messages %}
+  <!-- Flash Messages -->
+  <div class="flash-container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
           <div class="alert alert-{{ category }}">
-              {{ message }}
+            {{ message }}
+            <button class="close-btn" onclick="this.parentElement.style.display='none'">×</button>
           </div>
-      {% endfor %}
-  {% endif %}
-{% endwith %}
-<div class="login-container">
-  <h2>Welcome Back</h2>
-  <form method="POST">
-    <div class="input-group">
-      <input type="text" id="username" name="username" required>
-      <label for="username">Username</label>
-    </div>
-    
-    <div class="input-group">
-      <input type="password" id="password" name="password" required>
-      <label for="password">Password</label>
-      <div class="password-toggle" onclick="togglePassword()">
-        <svg class="icon" id="eyeIcon" viewBox="0 0 24 24">
-          <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
-        </svg>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  </div>
+
+  <div class="login-container">
+    <h2>Welcome Back</h2>
+    <form method="POST" id="loginForm" novalidate>
+      <div class="input-group">
+        <input type="text" id="username" name="username" required>
+        <label for="username">Username</label>
+        <div class="input-error">Username is required</div>
       </div>
-    </div>
-    
-    <button type="submit">Login</button>
+      
+      <div class="input-group">
+        <input type="password" id="password" name="password" required>
+        <label for="password">Password</label>
+        <div class="input-error">Password is required</div>
+        <div class="password-toggle" onclick="togglePassword()">
+          <svg class="icon" id="eyeIcon" viewBox="0 0 24 24">
+            <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+          </svg>
+        </div>
+      </div>
+      
+      <button type="submit" id="submitBtn">Login</button>
+      <a href="{{ url_for('index') }}" class="secondary-btn">Back to Home</a>
+    </form>
+  </div>
 
-    <a href="{{ url_for('index') }}" class="secondary-btn">Back to Home</a>
-
-  </form>
-</div>
-<script >
-  function togglePassword() {
-    const passwordInput = document.getElementById('password');
-    const eyeIcon = document.getElementById('eyeIcon');
-    
-    if (passwordInput.type === 'password') {
-      passwordInput.type = 'text';
-      eyeIcon.innerHTML = '<path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/>';
-    } else {
-      passwordInput.type = 'password';
-      eyeIcon.innerHTML = '<path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>';
+  <script>
+    function togglePassword() {
+      const passwordInput = document.getElementById('password');
+      const eyeIcon = document.getElementById('eyeIcon');
+      
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        eyeIcon.innerHTML = '<path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/>';
+      } else {
+        passwordInput.type = 'password';
+        eyeIcon.innerHTML = '<path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>';
+      }
     }
-  }
-  
-  // Add animations to form elements on page load
-  document.addEventListener('DOMContentLoaded', function() {
-    const container = document.querySelector('.login-container');
-    container.style.opacity = '0';
-    container.style.transform = 'translateY(20px)';
     
-    setTimeout(function() {
-      container.style.opacity = '1';
-      container.style.transform = 'translateY(0)';
-    }, 200);
-  });
-</script>
-
+    // Form validation
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      let isValid = true;
+      const username = document.getElementById('username');
+      const password = document.getElementById('password');
+      const submitBtn = document.getElementById('submitBtn');
+      
+      // Reset error states
+      document.querySelectorAll('.input-group').forEach(group => {
+        group.classList.remove('error');
+      });
+      
+      // Validate username
+      if (!username.value.trim()) {
+        username.parentElement.classList.add('error');
+        isValid = false;
+      }
+      
+      // Validate password
+      if (!password.value.trim()) {
+        password.parentElement.classList.add('error');
+        isValid = false;
+      }
+      
+      if (!isValid) {
+        e.preventDefault();
+      } else {
+        // Disable button during submission
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Logging in...';
+      }
+    });
+    
+    // Real-time validation
+    document.getElementById('username').addEventListener('input', function() {
+      if (this.value.trim()) {
+        this.parentElement.classList.remove('error');
+      }
+    });
+    
+    document.getElementById('password').addEventListener('input', function() {
+      if (this.value.trim()) {
+        this.parentElement.classList.remove('error');
+      }
+    });
+    
+    // Add animations to form elements on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      const container = document.querySelector('.login-container');
+      container.style.opacity = '0';
+      container.style.transform = 'translateY(20px)';
+      
+      setTimeout(function() {
+        container.style.opacity = '1';
+        container.style.transform = 'translateY(0)';
+      }, 200);
+    });
+  </script>
 </body>
 </html>

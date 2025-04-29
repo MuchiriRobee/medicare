@@ -1,6 +1,9 @@
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session, flash
 from flask_mail import Mail, Message
 import mysql.connector
+import secrets
+import string
+from datetime import datetime, timedelta
 from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime
 import bcrypt
@@ -37,6 +40,10 @@ def services():
 @app.route('/about')
 def about():
     return render_template('about.html')
+# faq page
+@app.route('/faq')
+def faq():
+    return render_template('faq.html')
 
 # Contact page
 @app.route('/contact')
@@ -675,8 +682,292 @@ def delete_expired_appointments():
     conn.close()
     print("Expired appointments deleted.")
 
+# Add these new routes to app.py
 
+# Patient registration
+@app.route('/patient/register', methods=['GET', 'POST'])
+def patient_register():
+    if request.method == 'POST':
+        full_name = request.form['full_name']
+        email = request.form['email']
+        phone = request.form['phone']
+        password = request.form['password']
+        
+        # Hash password
+        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+        
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        try:
+            cursor.execute('''
+                INSERT INTO patients (full_name, email, phone, password)
+                VALUES (%s, %s, %s, %s)
+            ''', (full_name, email, phone, hashed_password))
+            conn.commit()
+            flash('Registration successful! Please log in.', 'success')
+            return redirect(url_for('patient_login'))
+        except mysql.connector.IntegrityError:
+            flash('Email already exists. Please use a different email.', 'error')
+            return redirect(url_for('patient_register'))
+        finally:
+            cursor.close()
+            conn.close()
+    
+    return render_template('patient/register.html')
 
+# Patient login
+@app.route('/patient/login', methods=['GET', 'POST'])
+def patient_login():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute('SELECT * FROM patients WHERE email = %s', (email,))
+        patient = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        
+        if patient and bcrypt.checkpw(password.encode('utf-8'), patient['password'].encode('utf-8')):
+            session['patient_id'] = patient['id']
+            session['patient_email'] = patient['email']
+            return redirect(url_for('patient_dashboard'))
+        else:
+            flash('Invalid email or password', 'error')
+    
+    return render_template('patient/login.html')
+
+# Patient dashboard
+@app.route('/patient/dashboard')
+def patient_dashboard():
+    if 'patient_id' not in session:
+        return redirect(url_for('patient_login'))
+    
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    # Get patient info
+    cursor.execute('SELECT full_name, email, phone FROM patients WHERE id = %s', (session['patient_id'],))
+    patient = cursor.fetchone()
+    
+    # Get appointments
+    cursor.execute('''
+        SELECT a.*, s.name as service_name 
+        FROM appointments a
+        LEFT JOIN services s ON a.service_id = s.id
+        WHERE a.email = %s
+        ORDER BY a.appointment_date DESC
+    ''', (session['patient_email'],))
+    appointments = cursor.fetchall()
+    
+    cursor.close()
+    conn.close()
+    
+    return render_template('patient/dashboard.html', patient=patient, appointments=appointments)
+
+# Cancel appointment
+@app.route('/patient/cancel_appointment/<int:appointment_id>', methods=['POST'])
+def cancel_appointment(appointment_id):
+    if 'patient_id' not in session:
+        return jsonify({'success': False, 'error': 'Unauthorized'}), 401
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        # Verify the appointment belongs to the patient
+        cursor.execute('SELECT email FROM appointments WHERE id = %s', (appointment_id,))
+        appointment = cursor.fetchone()
+        
+        if not appointment or appointment[0] != session['patient_email']:
+            return jsonify({'success': False, 'error': 'Unauthorized'}), 401
+        
+        # Delete the appointment
+        cursor.execute('DELETE FROM appointments WHERE id = %s', (appointment_id,))
+        conn.commit()
+        
+        return jsonify({'success': True})
+    except Exception as e:
+        conn.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+# Patient logout
+@app.route('/patient/logout')
+def patient_logout():
+    session.pop('patient_id', None)
+    session.pop('patient_email', None)
+    return redirect(url_for('index'))
+
+# Password reset routes
+@app.route('/patient/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    if request.method == 'POST':
+        email = request.form['email']
+        
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        
+        try:
+            # Check if email exists
+            cursor.execute('SELECT id FROM patients WHERE email = %s', (email,))
+            patient = cursor.fetchone()
+            
+            if patient:
+                # Generate token
+                token = ''.join(secrets.choice(string.ascii_letters + string.digits) for _ in range(64))
+                expires_at = datetime.now() + timedelta(hours=1)
+                
+                # Store token in database
+                cursor.execute('''
+                    INSERT INTO password_reset_tokens (patient_id, token, expires_at)
+                    VALUES (%s, %s, %s)
+                ''', (patient['id'], token, expires_at))
+                conn.commit()
+                
+                # Send email with reset link
+                reset_link = url_for('reset_password', token=token, _external=True)
+                send_password_reset_email(email, reset_link)
+            
+            # Always show success message to prevent email enumeration
+            flash('If an account with that email exists, a password reset link has been sent.', 'success')
+            return redirect(url_for('patient_login'))
+            
+        except Exception as e:
+            conn.rollback()
+            flash('An error occurred. Please try again.', 'error')
+            return redirect(url_for('forgot_password'))
+            
+        finally:
+            cursor.close()
+            conn.close()
+    
+    return render_template('patient/forgot_password.html')
+
+@app.route('/patient/reset-password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    try:
+        # Validate token
+        cursor.execute('''
+            SELECT p.id, p.email 
+            FROM password_reset_tokens t
+            JOIN patients p ON t.patient_id = p.id
+            WHERE t.token = %s 
+            AND t.expires_at > NOW() 
+            AND t.used = FALSE
+        ''', (token,))
+        token_data = cursor.fetchone()
+        
+        if not token_data:
+            flash('Invalid or expired password reset link.', 'error')
+            return redirect(url_for('forgot_password'))
+        
+        if request.method == 'POST':
+            new_password = request.form['password']
+            confirm_password = request.form['confirm_password']
+            
+            if new_password != confirm_password:
+                flash('Passwords do not match.', 'error')
+                return redirect(request.url)
+            
+            # Update password
+            hashed_password = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt())
+            cursor.execute('UPDATE patients SET password = %s WHERE id = %s', 
+                          (hashed_password, token_data['id']))
+            
+            # Mark token as used
+            cursor.execute('UPDATE password_reset_tokens SET used = TRUE WHERE token = %s', (token,))
+            
+            conn.commit()
+            flash('Your password has been updated successfully! Please log in.', 'success')
+            return redirect(url_for('patient_login'))
+        
+        return render_template('patient/reset_password.html', token=token)
+        
+    except Exception as e:
+        conn.rollback()
+        flash('An error occurred. Please try again.', 'error')
+        return redirect(url_for('forgot_password'))
+        
+    finally:
+        cursor.close()
+        conn.close()
+
+# Add this email sending function
+def send_password_reset_email(email, reset_link):
+    try:
+        msg = Message('Password Reset Request - Medicare Clinic',
+                      recipients=[email])
+        
+        msg.body = f"""
+You have requested to reset your password for your Medicare Clinic patient account.
+
+Please click the following link to reset your password:
+{reset_link}
+
+This link will expire in 1 hour. If you didn't request a password reset, please ignore this email.
+
+Best regards,
+Medicare Clinic Team
+"""
+        mail.send(msg)
+        return True
+    except Exception as e:
+        print(f"Error sending password reset email: {str(e)}")
+        return False
+
+# Add this route for changing password while logged in
+@app.route('/patient/change-password', methods=['GET', 'POST'])
+def change_password():
+    if 'patient_id' not in session:
+        return redirect(url_for('patient_login'))
+    
+    if request.method == 'POST':
+        current_password = request.form['current_password']
+        new_password = request.form['new_password']
+        confirm_password = request.form['confirm_password']
+        
+        if new_password != confirm_password:
+            flash('New passwords do not match.', 'error')
+            return redirect(url_for('change_password'))
+        
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        
+        try:
+            # Verify current password
+            cursor.execute('SELECT password FROM patients WHERE id = %s', (session['patient_id'],))
+            patient = cursor.fetchone()
+            
+            if not patient or not bcrypt.checkpw(current_password.encode('utf-8'), patient['password'].encode('utf-8')):
+                flash('Current password is incorrect.', 'error')
+                return redirect(url_for('change_password'))
+            
+            # Update password
+            hashed_password = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt())
+            cursor.execute('UPDATE patients SET password = %s WHERE id = %s', 
+                          (hashed_password, session['patient_id']))
+            conn.commit()
+            
+            flash('Your password has been changed successfully!', 'success')
+            return redirect(url_for('patient_dashboard'))
+            
+        except Exception as e:
+            conn.rollback()
+            flash('An error occurred. Please try again.', 'error')
+            return redirect(url_for('change_password'))
+            
+        finally:
+            cursor.close()
+            conn.close()
+    
+    return render_template('patient/change_password.html')
 # Initialize the scheduler
 scheduler = BackgroundScheduler()
 scheduler.add_job(func=delete_expired_appointments, trigger='cron', hour=0, minute=0)  # Run daily at midnight
@@ -684,5 +975,6 @@ scheduler.start()
 
 if __name__ == '__main__':
     app.run(debug=True)
-    
+
+ 
 
