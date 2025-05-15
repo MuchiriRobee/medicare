@@ -332,7 +332,7 @@
             <form class="auth-form" method="POST">
                 <div class="form-group">
                     <label for="email">Email</label>
-                    <input type="email" id="email" name="email" required>
+                    <input type="email" id="email" name="email" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" title="Please enter a valid email address (e.g., user@example.com)">
                     <li><i>(Email used to book appointment)</i></li>
                 </div>
                 
@@ -349,7 +349,7 @@
             
             <div class="auth-footer">
                 <p>Don't have an account? <a href="{{ url_for('patient_register') }}">Register here</a></p>
-                <!--<p><a href="{{ url_for('forgot_password') }}">Forgot password?</a></p>-->
+                <p><a href="{{ url_for('forgot_password') }}">Forgot password?</a></p>
             </div>
         </div>
     </div>
@@ -374,7 +374,7 @@
                         <li><a href="{{ url_for('index') }}"><i class="fas fa-chevron-right"></i> Home</a></li>
                         <li><a href="{{ url_for('about') }}"><i class="fas fa-chevron-right"></i> About Us</a></li>
                         <li><a href="{{ url_for('services') }}"><i class="fas fa-chevron-right"></i> Services</a></li>
-                        <li><a href="{{ url_for('book') }}"><i class="fas fa-chevron-right"></i> Book Appointment</a></li>
+                        <li><a href="{{ url_for('patient_login') }}"><i class="fas fa-chevron-right"></i> Book Appointment</a></li>
                         <li><a href="{{ url_for('contact') }}"><i class="fas fa-chevron-right"></i> Contact Us</a></li>
                     </ul>
                 </div>

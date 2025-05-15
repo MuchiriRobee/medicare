@@ -338,14 +338,13 @@
     
     <div class="form-group">
         <label for="email">Email</label>
-        <input type="email" id="email" name="email" required>
+        <input type="email" id="email" name="email" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" title="Please enter a valid email address (e.g., user@example.com)">
         <li><i>(Email used to book appointment)</i></li>
-
     </div>
     
     <div class="form-group">
         <label for="phone">Phone Number</label>
-        <input type="tel" id="phone" name="phone" required>
+        <input type="tel" id="phone" name="phone" required pattern="07\d{8}" title="Phone number must be 10 digits starting with 07 (e.g., 0712345678)">
     </div>
     
 <div class="form-group">
@@ -385,7 +384,7 @@
                         <li><a href="{{ url_for('index') }}"><i class="fas fa-chevron-right"></i> Home</a></li>
                         <li><a href="{{ url_for('about') }}"><i class="fas fa-chevron-right"></i> About Us</a></li>
                         <li><a href="{{ url_for('services') }}"><i class="fas fa-chevron-right"></i> Services</a></li>
-                        <li><a href="{{ url_for('book') }}"><i class="fas fa-chevron-right"></i> Book Appointment</a></li>
+                        <li><a href="{{ url_for('patient_login') }}"><i class="fas fa-chevron-right"></i> Book Appointment</a></li>
                         <li><a href="{{ url_for('contact') }}"><i class="fas fa-chevron-right"></i> Contact Us</a></li>
                     </ul>
                 </div>
